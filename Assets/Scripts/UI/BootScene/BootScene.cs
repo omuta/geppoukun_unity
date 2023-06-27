@@ -9,6 +9,8 @@ using UnityEditor.SearchService;
 public class BootScene : MonoBehaviour {
     // Start is called before the first frame update
     void Start() {
+        SceneManager.LoadScene(UIManager.getCurrentScene());
+
         //UIManager.Instance.SceneList[UIManager.Instance.SceneNo].LoadScene();
 
         //UIManager uIManager = new UIManager();

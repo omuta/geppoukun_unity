@@ -22,13 +22,13 @@ public class SceneData {
         this.controlList = controlList;
     }
 
-    public void LoadScene() {
+    public string getSceneName() {
         // ‹N“®Žž‚Ì‰æ–Ê
         //foreach (var control in controlList) {
         //    control.Prefab.transform.SetParent(PanelBody.transform);
         //    control.Prefab.transform.parent = PanelBody.transform;
         //}
-        SceneManager.LoadScene(GetName(type));
+        return GetName(type);
     }
 
     public string GetName(Type type) {

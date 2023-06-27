@@ -8,12 +8,12 @@ public sealed class UIManager : MonoBehaviour {
     private static UIManager instance;
     public static UIManager Instance => instance;
 
-    const string CurrentScene = "main";
+    static string CurrentScene = "main";
     const string SceneMain = "main";
     const string ScenejigyoujyouList = "jigyoujyouList";
     const string ResourceButton = @"Prefabs\Button";
 
-    public List<SceneData> SceneList = new List<SceneData>();
+    public static List<SceneData> SceneList = new List<SceneData>();
     public int SceneNo;
 
     public int Score = 0;
@@ -21,7 +21,7 @@ public sealed class UIManager : MonoBehaviour {
     [RuntimeInitializeOnLoadMethod()]
     static void Init() {
         //シーン切替 .
-        //SceneManager.LoadScene("SceneFIX");
+        //SceneManager.LoadScene("BootScene");
     }
 
     private void Awake() {
@@ -32,22 +32,43 @@ public sealed class UIManager : MonoBehaviour {
 
         instance = this;
 
-        if(init == false) {
+        if (init == false) {
             SceneManager.LoadScene("BootScene");
             CreateSceneList();
             init = true;
             SceneNo = 0;
-            // シーン切り替え後のスクリプトを取得
-            //var controlList = GameObject.FindWithTag("GameManager").GetComponent<ControlList>();
-            //controlList.controlList = SceneList[0].controlList;
         }
+
+        //if(init == false) {
+        //    SceneManager.LoadScene("BootScene");
+        //    CreateSceneList();
+        //    init = true;
+        //    SceneNo = 0;
+        //    // シーン切り替え後のスクリプトを取得
+        //    //var controlList = GameObject.FindWithTag("GameManager").GetComponent<ControlList>();
+        //    //controlList.controlList = SceneList[0].controlList;
+        //}
 
         // Scene遷移で破棄されなようにする。      
         DontDestroyOnLoad(this);
     }
 
     private void Start() {
+        string currentScene = getCurrentScene();
+        if (currentScene == string.Empty) {
+            return;
+        }
+        //SceneManager.LoadScene(currentScene);
         //UIManager.Instance.SceneList[UIManager.Instance.SceneNo].LoadScene();
+    }
+
+    public static string getCurrentScene() {
+        foreach (SceneData sceneData in SceneList) {
+            if(CurrentScene == sceneData.SceneName) {
+                return sceneData.getSceneName();
+            }
+        }
+        return string.Empty;
     }
 
     void CreateSceneList() {
