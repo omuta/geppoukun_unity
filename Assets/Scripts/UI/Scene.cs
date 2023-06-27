@@ -4,7 +4,7 @@ using UnityEditor.U2D.Animation;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class SceneController {
+public class SceneData {
     public enum Type { FIX, Scroll, List}
 
     public string SceneName;
@@ -14,7 +14,7 @@ public class SceneController {
     public List<Control> controlList = new List<Control>();
     readonly GameObject PanelBody = GameObject.Find("Canvas/Panel/PanelBody");
 
-    public SceneController(string SceneName, string Title, string PrevScene, Type type, List<Control> controlList) {
+    public SceneData(string SceneName, string Title, string PrevScene, Type type, List<Control> controlList) {
         this.SceneName = SceneName;
         this.Title = Title;
         this.PrevScene = PrevScene;
@@ -32,7 +32,7 @@ public class SceneController {
     }
 
     public string GetName(Type type) {
-        string[] dayNames = { "SceneFIX", "SceneScroll", "SceneList" };
-        return dayNames[(int)type];
+        string[] SceneNames = { "SceneFIX", "SceneScroll", "SceneList" };
+        return SceneNames[(int)type];
     }
 }
