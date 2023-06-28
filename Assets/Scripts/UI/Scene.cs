@@ -22,16 +22,20 @@ public class SceneData {
         this.controlList = controlList;
     }
 
+    public List<Control> getControlList() {
+        return controlList;
+    }
+
     public string getSceneName() {
         // ‹N“®Žž‚Ì‰æ–Ê
         //foreach (var control in controlList) {
         //    control.Prefab.transform.SetParent(PanelBody.transform);
         //    control.Prefab.transform.parent = PanelBody.transform;
         //}
-        return GetName(type);
+        return GetType();
     }
 
-    public string GetName(Type type) {
+    public string GetType() {
         string[] SceneNames = { "SceneFIX", "SceneScroll", "SceneList" };
         return SceneNames[(int)type];
     }

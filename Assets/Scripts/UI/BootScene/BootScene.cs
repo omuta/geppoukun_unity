@@ -9,7 +9,9 @@ using UnityEditor.SearchService;
 public class BootScene : MonoBehaviour {
     // Start is called before the first frame update
     void Start() {
-        SceneManager.LoadScene("SceneFIX");
+        UIManager.Instance.CreateSceneList();
+
+        SceneManager.LoadScene(UIManager.Instance.getCurrentScene().GetType());
     }
 
     //private const string SourceScenePath = "Assets/Scene/Main.unity";
