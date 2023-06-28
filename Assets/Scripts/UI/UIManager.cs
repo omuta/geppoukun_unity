@@ -1,84 +1,34 @@
-// "GameScene"でGameObjectにアタッチされてる想定
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public sealed class UIManager : MonoBehaviour {
-    private static bool init = false;
-    private static UIManager instance;
-    public static UIManager Instance => instance;
+public class UIManager : MonoBehaviour {
+    public static UIManager instance;
 
-    static string CurrentScene = "main";
-    const string SceneMain = "main";
-    const string ScenejigyoujyouList = "jigyoujyouList";
-    const string ResourceButton = @"Prefabs\Button";
+    //public static List<SceneData> SceneList = new List<SceneData>();
 
-    public static List<SceneData> SceneList = new List<SceneData>();
-    public int SceneNo;
-
-    public int Score = 0;
-
-    [RuntimeInitializeOnLoadMethod()]
-    static void Init() {
-        //シーン切替 .
-        //SceneManager.LoadScene("BootScene");
-    }
 
     private void Awake() {
-        // instanceがすでにあったら自分を消去する。
-        if (instance && this != instance) {
-            Destroy(this.gameObject);
+        if (instance == null) {
+            instance = this;
+            DontDestroyOnLoad(gameObject);
+        } else {
+            Destroy(gameObject);
         }
-
-        instance = this;
-
-        if (init == false) {
-            SceneManager.LoadScene("BootScene");
-            CreateSceneList();
-            init = true;
-            SceneNo = 0;
-        }
-
-        //if(init == false) {
-        //    SceneManager.LoadScene("BootScene");
-        //    CreateSceneList();
-        //    init = true;
-        //    SceneNo = 0;
-        //    // シーン切り替え後のスクリプトを取得
-        //    //var controlList = GameObject.FindWithTag("GameManager").GetComponent<ControlList>();
-        //    //controlList.controlList = SceneList[0].controlList;
-        //}
-
-        // Scene遷移で破棄されなようにする。      
-        DontDestroyOnLoad(this);
     }
 
-    private void Start() {
-        string currentScene = getCurrentScene();
-        if (currentScene == string.Empty) {
-            return;
-        }
-        //SceneManager.LoadScene(currentScene);
-        //UIManager.Instance.SceneList[UIManager.Instance.SceneNo].LoadScene();
-    }
+    //const string SceneMain = "main";
+    //const string ScenejigyoujyouList = "jigyoujyouList";
+    //const string ResourceButton = @"Prefabs\Button";
+    //void CreateSceneList() {
+    //    SceneList.Add(new SceneData(SceneMain, "月報くん", null, SceneData.Type.FIX, ControlList));
+    //}
 
-    public static string getCurrentScene() {
-        foreach (SceneData sceneData in SceneList) {
-            if(CurrentScene == sceneData.SceneName) {
-                return sceneData.getSceneName();
-            }
-        }
-        return string.Empty;
-    }
-
-    void CreateSceneList() {
-        SceneList.Add(new SceneData(SceneMain, "月報くん", null, SceneData.Type.FIX, ControlList));
-    }
-
-    private List<Control> ControlList = new List<Control>() {
-        new ButtonControl("点検を行う", 4, ScenejigyoujyouList, (GameObject)Resources.Load (ResourceButton)),
-        new ButtonControl("太陽光発電設備\n点検報告書", 2, ScenejigyoujyouList, (GameObject)Resources.Load (ResourceButton)),
-        new ButtonControl("点検を行う", 2, ScenejigyoujyouList, (GameObject)Resources.Load (ResourceButton)),
-        new ButtonControl("点検を行う", 1, ScenejigyoujyouList, (GameObject)Resources.Load (ResourceButton)),
-    };
+    //private static List<Control> ControlList = new List<Control>() {
+    //    new ButtonControl("点検を行う", 4, ScenejigyoujyouList, (GameObject)Resources.Load (ResourceButton)),
+    //    new ButtonControl("太陽光発電設備\n点検報告書", 2, ScenejigyoujyouList, (GameObject)Resources.Load (ResourceButton)),
+    //    new ButtonControl("点検を行う", 2, ScenejigyoujyouList, (GameObject)Resources.Load (ResourceButton)),
+    //    new ButtonControl("点検を行う", 1, ScenejigyoujyouList, (GameObject)Resources.Load (ResourceButton)),
+    //};
 }
