@@ -15,14 +15,9 @@ public class CellViewRecord : EnhancedScrollerCellView {
 
     public Action<CellViewRecord> onClick;
 
-    public CellViewRecord(string title, string subtitle) {
-        _title.text = title;
-        _subtitle.text = subtitle;
-    }
-
-    public void SetData(CellViewRecord data) {
-        _title.text = data._title.text;
-        _subtitle.text = data._subtitle.text;
+    public void SetData(JigyousyoData data) {
+        _title.text = data.textTitle;
+        _subtitle.text = data.textSubTitle;
     }
 
     private void Awake() {

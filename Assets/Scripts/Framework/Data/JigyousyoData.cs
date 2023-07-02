@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace PreGeppou.Data {
-    internal class JigyousyoData {
+    public class JigyousyoData {
         private static readonly long serialVersionUID = 1L;
         public string textTitle;
         public string textSubTitle;

@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class ScrollViewManager : MonoBehaviour, IEnhancedScrollerDelegate {
-    private List<CellViewRecord> _data;
+    private List<JigyousyoData> _data;
 
     [SerializeField]
     private EnhancedScroller _scroller;
@@ -13,9 +13,9 @@ public class ScrollViewManager : MonoBehaviour, IEnhancedScrollerDelegate {
 
     private void Start() {
         // データを作成
-        _data = new List<CellViewRecord>();
+        _data = new List<JigyousyoData>();
         for (int i = 0; i < 30; i++) {
-            _data.Add(new CellViewRecord("title", "subtitle"));
+            _data.Add(new JigyousyoData("title", "subTitle", "", "", 0, 0, 0, false));
         }
 
         _scroller.cellViewVisibilityChanged += view => {
@@ -45,7 +45,7 @@ public class ScrollViewManager : MonoBehaviour, IEnhancedScrollerDelegate {
 
     // セルのサイズ（縦幅or横幅）を返す
     public float GetCellViewSize(EnhancedScroller scroller, int dataIndex) {
-        return 50;
+        return 280;
     }
 
     // セルのViewを返す
