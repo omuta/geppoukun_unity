@@ -9,7 +9,7 @@ EditorBuildSettings:
     path: Assets/Scenes/BootScene.unity
     guid: 345d0887e878f2a478a93fbd730e1055
   - enabled: 1
-    path: Assets/Scenes/SceneFIX.unity
+    path: Assets/Scenes/SceneScroll.unity
     guid: 90a1eca617a10fc4f9c66793f26452e7
   m_configObjects:
     com.unity.adaptiveperformance.loader_settings: {fileID: 11400000, guid: aa9e599cbea77654894a31f08ba97920, type: 2}

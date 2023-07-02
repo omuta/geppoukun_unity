@@ -6,28 +6,34 @@ public class Control {
     public string Title;
     public string Prefab;
 
-    public Control(string Title, string Prefab) {
-        this.Title = Title;
+    public Control(string Prefab) {
         this.Prefab = Prefab;
     }
 }
 
 public class ButtonControl : Control {
+    public string Title;
     public int weight;
     public string MoveScene;
 
-    public ButtonControl(string Title, int weight, string MoveScene, string Prefab) : base(Title, Prefab) {
+    public ButtonControl(string Title, int weight, string MoveScene, string Prefab) : base(Prefab) {
+        this.Title = Title;
         this.weight = weight;
         this.MoveScene = MoveScene;
     }
 }
 
-public class JigyoujyouControl : Control {
-    public string SubTitle;
+public class ListControl : Control {
+    public string sourceFile;
     public string MoveScene;
 
-    public JigyoujyouControl(string Title, string SubTitle, string MoveScene, string Prefab) : base(Title, Prefab) {
-        this.SubTitle = SubTitle;
+    public ListControl(string MoveScene, string Prefab) : base(Prefab) {
         this.MoveScene = MoveScene;
+    }
+}
+
+public class JigyoujyouControl : ListControl {
+
+    public JigyoujyouControl(string MoveScene, string Prefab) : base(MoveScene, Prefab) {
     }
 }

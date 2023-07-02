@@ -522,7 +522,7 @@ MonoBehaviour:
   m_ChildControlWidth: 1
   m_ChildControlHeight: 1
   m_ChildScaleWidth: 0
-  m_ChildScaleHeight: 1
+  m_ChildScaleHeight: 0
   m_ReverseArrangement: 0
 --- !u!114 &1578621881
 MonoBehaviour:
@@ -595,7 +595,7 @@ GameObject:
   - component: {fileID: 1763934535}
   - component: {fileID: 1763934537}
   - component: {fileID: 1763934539}
-  - component: {fileID: 1763934538}
+  - component: {fileID: 1763934540}
   m_Layer: 5
   m_Name: Panel
   m_TagString: Untagged
@@ -689,18 +689,6 @@ MonoBehaviour:
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 1
   m_ReverseArrangement: 0
---- !u!114 &1763934538
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1763934533}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8a9d4b3722d25b848adf294611480f99, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &1763934539
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -711,6 +699,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 71faf5f9d5ec7c640b16d6366c24021b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1763934540
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1763934533}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8a9d4b3722d25b848adf294611480f99, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &1901443381
