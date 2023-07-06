@@ -1,6 +1,8 @@
 using EnhancedUI.EnhancedScroller;
+using Newtonsoft.Json;
 using PreGeppou.Data;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 
 public class ScrollViewManager : MonoBehaviour, IEnhancedScrollerDelegate {
@@ -13,10 +15,18 @@ public class ScrollViewManager : MonoBehaviour, IEnhancedScrollerDelegate {
 
     private void Start() {
         // ƒf[ƒ^‚ğì¬
-        _data = new List<JigyousyoData>();
-        for (int i = 0; i < 30; i++) {
-            _data.Add(new JigyousyoData("title", "subTitle", "", "", 0, 0, 0, false));
+        var path = Path.Combine(Application.persistentDataPath, JigyousyoData.FileName);
+        if (File.Exists(path)) {
+            string readData = File.ReadAllText(path);
+            _data = JsonConvert.DeserializeObject<List<JigyousyoData>>(readData);
+        } else {
+            _data = new List<JigyousyoData>();
+            _data.Add(new JigyousyoData("–‹Æê–¼", "x•”x“X–¼", "", "", 0, 0, 0, false));
         }
+        //_data = new List<JigyousyoData>();
+        //for (int i = 0; i < 30; i++) {
+        //    _data.Add(new JigyousyoData("title", "subTitle", "", "", 0, 0, 0, false));
+        //}
 
         _scroller.cellViewVisibilityChanged += view => {
             if (view.active) {

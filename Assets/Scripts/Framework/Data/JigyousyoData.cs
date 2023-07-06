@@ -6,8 +6,9 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace PreGeppou.Data {
+    [System.Serializable]
     public class JigyousyoData {
-        private static readonly long serialVersionUID = 1L;
+        public static string FileName = "Jigyoujyou.json";
         public string textTitle;
         public string textSubTitle;
         public string textAddress;
@@ -31,6 +32,12 @@ namespace PreGeppou.Data {
         public string textDenryokugaisya;
         public string textKeiyakusyubetu;
         public string textCyouhyouFreeFormatFileName;
+        public JigyousyoData() {
+        }
+        public JigyousyoData(string textTitle, string textSubTitle) {
+            this.textTitle = textTitle;
+            this.textSubTitle = textSubTitle;
+        }
         public JigyousyoData(string textTitle, string textSubTitle, string textDenryokugaisya, string textKeiyakusyubetu, int image, int textColor, int bgColor, bool finish) {
             this.textTitle = textTitle;
             this.textSubTitle = textSubTitle;

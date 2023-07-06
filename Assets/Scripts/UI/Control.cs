@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class Control {
-    public string Title;
     public string Prefab;
 
     public Control(string Prefab) {
