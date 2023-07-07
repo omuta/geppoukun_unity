@@ -30,6 +30,6 @@ public class AARTest : MonoBehaviour
     /// ƒvƒ‰ƒOƒCƒ“‘¤‚©‚çUnity‚ğŒÄ‚Ô
     /// </summary>
     public void FromAndroid(string str) {
-        //        txtMessage.text += str;
+        txtMessage.text += str;
     }
 }

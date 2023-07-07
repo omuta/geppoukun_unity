@@ -1,9 +1,9 @@
 {
     "m_SelectedDeviceId": "QV711BSQ3D",
     "m_SelectedPackage": {
-        "deviceId": "QV711BSQ3D",
-        "name": "com.DefaultCompany.com.unity.template.mobile2D",
-        "processId": 8329,
+        "deviceId": "",
+        "name": "",
+        "processId": 0,
         "exited": false
     },
     "m_SelectedPriority": 0,
@@ -11,31 +11,37 @@
         {
             "deviceId": "QV711BSQ3D",
             "name": "com.DefaultCompany.com.unity.template.mobile2D",
-            "processId": 28836,
-            "exited": false
-        },
-        {
-            "deviceId": "QV711BSQ3D",
-            "name": "com.DefaultCompany.com.unity.template.mobile2D",
-            "processId": 32125,
-            "exited": false
-        },
-        {
-            "deviceId": "QV711BSQ3D",
-            "name": "com.DefaultCompany.com.unity.template.mobile2D",
-            "processId": 5833,
-            "exited": false
-        },
-        {
-            "deviceId": "QV711BSQ3D",
-            "name": "com.DefaultCompany.com.unity.template.mobile2D",
             "processId": 7296,
-            "exited": false
+            "exited": true
         },
         {
             "deviceId": "QV711BSQ3D",
             "name": "com.DefaultCompany.com.unity.template.mobile2D",
             "processId": 8329,
+            "exited": true
+        },
+        {
+            "deviceId": "QV711BSQ3D",
+            "name": "com.DefaultCompany.com.unity.template.mobile2D",
+            "processId": 11793,
+            "exited": true
+        },
+        {
+            "deviceId": "QV711BSQ3D",
+            "name": "jp.naver.line.android",
+            "processId": 25813,
+            "exited": true
+        },
+        {
+            "deviceId": "QV711BSQ3D",
+            "name": "com.sonyericsson.usbux",
+            "processId": 13011,
+            "exited": false
+        },
+        {
+            "deviceId": "QV711BSQ3D",
+            "name": "jp.naver.line.android",
+            "processId": 6918,
             "exited": false
         }
     ],

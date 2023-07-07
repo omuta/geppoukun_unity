@@ -1114,6 +1114,7 @@ GameObject:
   - component: {fileID: 1763934535}
   - component: {fileID: 1763934537}
   - component: {fileID: 1763934539}
+  - component: {fileID: 1763934540}
   m_Layer: 5
   m_Name: Panel
   m_TagString: Untagged
@@ -1220,6 +1221,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 71faf5f9d5ec7c640b16d6366c24021b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &1763934540
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1763934533}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ccef8d2eedfc4154395b2bb92e3f7941, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  txtMessage: {fileID: 2112417865}
+  btnAndroid: {fileID: 1314061810}
 --- !u!1 &1901443381
 GameObject:
   m_ObjectHideFlags: 0
