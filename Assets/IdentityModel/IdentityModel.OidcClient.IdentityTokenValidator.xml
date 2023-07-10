@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>IdentityModel.OidcClient.IdentityTokenValidator</name>
+    </assembly>
+    <members>
+        <member name="T:IdentityModel.OidcClient.JwtHandlerIdentityTokenValidator">
+            <inheritdoc />
+        </member>
+        <member name="M:IdentityModel.OidcClient.JwtHandlerIdentityTokenValidator.ValidateAsync(System.String,IdentityModel.OidcClient.OidcClientOptions,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+    </members>
+</doc>
