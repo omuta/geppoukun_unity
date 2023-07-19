@@ -14,6 +14,12 @@ public class UIManager : SingletonMonoBehaviour<UIManager> {
     public static List<SceneData> SceneList = new List<SceneData>();
 
     virtual protected void Awake() {
+        //if (UIManager.Instance.getCurrentScene() == null) {
+        //    CreateSceneList();
+        //    SceneManager.LoadScene("BootScene");
+        //    return;
+        //}
+
         base.Awake();
         CreateControlList();
         CreateSceneList();

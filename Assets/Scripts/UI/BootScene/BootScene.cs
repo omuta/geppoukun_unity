@@ -1,10 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
-using UnityEditor.SceneTemplate;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using UnityEditor.SearchService;
 
 public class BootScene : MonoBehaviour {
     // Start is called before the first frame update

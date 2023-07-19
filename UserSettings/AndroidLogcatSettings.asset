@@ -2,8 +2,8 @@
     "m_SelectedDeviceId": "QV711BSQ3D",
     "m_SelectedPackage": {
         "deviceId": "QV711BSQ3D",
-        "name": "com.DefaultCompany.com.unity.template.mobile2D",
-        "processId": 8329,
+        "name": "increase.geppoukun",
+        "processId": 6716,
         "exited": false
     },
     "m_SelectedPriority": 0,
@@ -36,6 +36,18 @@
             "deviceId": "QV711BSQ3D",
             "name": "com.DefaultCompany.com.unity.template.mobile2D",
             "processId": 8329,
+            "exited": false
+        },
+        {
+            "deviceId": "QV711BSQ3D",
+            "name": "increase.geppoukun",
+            "processId": 5865,
+            "exited": false
+        },
+        {
+            "deviceId": "QV711BSQ3D",
+            "name": "increase.geppoukun",
+            "processId": 6716,
             "exited": false
         }
     ],
