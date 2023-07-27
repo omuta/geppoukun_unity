@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public class UIManager : SingletonMonoBehaviour<UIManager> {
-    private static bool IsBoot = false;
+    public static bool IsBoot = false;
     public static string CurrentScene = "main";
     const string SceneMain = "main";
     const string ScenejigyoujyouList = "jigyoujyouList";
@@ -48,7 +48,6 @@ public class UIManager : SingletonMonoBehaviour<UIManager> {
     public SceneData getCurrentScene() {
         SceneData SceneType = null;
         if (IsBoot == false) {
-            IsBoot = true;
             return SceneType;
         }
         // ‹N“®Žž‚Ì‰æ–Ê

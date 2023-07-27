@@ -1,54 +1,48 @@
 {
     "m_SelectedDeviceId": "QV711BSQ3D",
     "m_SelectedPackage": {
-        "deviceId": "QV711BSQ3D",
-        "name": "increase.geppoukun",
-        "processId": 6716,
+        "deviceId": "",
+        "name": "",
+        "processId": 0,
         "exited": false
     },
     "m_SelectedPriority": 0,
     "m_KnownPackagesForSerialization": [
         {
             "deviceId": "QV711BSQ3D",
-            "name": "com.DefaultCompany.com.unity.template.mobile2D",
-            "processId": 28836,
+            "name": "increase.geppoukun",
+            "processId": 31971,
+            "exited": true
+        },
+        {
+            "deviceId": "QV711BSQ3D",
+            "name": "increase.geppoukun",
+            "processId": 32525,
+            "exited": true
+        },
+        {
+            "deviceId": "QV711BSQ3D",
+            "name": "com.x.srihome",
+            "processId": 4872,
+            "exited": true
+        },
+        {
+            "deviceId": "QV711BSQ3D",
+            "name": "jp.naver.line.android",
+            "processId": 6278,
             "exited": false
         },
         {
             "deviceId": "QV711BSQ3D",
-            "name": "com.DefaultCompany.com.unity.template.mobile2D",
-            "processId": 32125,
-            "exited": false
-        },
-        {
-            "deviceId": "QV711BSQ3D",
-            "name": "com.DefaultCompany.com.unity.template.mobile2D",
-            "processId": 5833,
-            "exited": false
-        },
-        {
-            "deviceId": "QV711BSQ3D",
-            "name": "com.DefaultCompany.com.unity.template.mobile2D",
-            "processId": 7296,
-            "exited": false
-        },
-        {
-            "deviceId": "QV711BSQ3D",
-            "name": "com.DefaultCompany.com.unity.template.mobile2D",
-            "processId": 8329,
+            "name": "com.nttdocomo.android.dhome",
+            "processId": 8436,
             "exited": false
         },
         {
             "deviceId": "QV711BSQ3D",
             "name": "increase.geppoukun",
-            "processId": 5865,
-            "exited": false
-        },
-        {
-            "deviceId": "QV711BSQ3D",
-            "name": "increase.geppoukun",
-            "processId": 6716,
-            "exited": false
+            "processId": 16955,
+            "exited": true
         }
     ],
     "m_Tags": {
