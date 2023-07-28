@@ -14,7 +14,6 @@ public class UIManagerAddComponentJigyousyoList : MonoBehaviour {
     [System.Obsolete]
     void Start() {
         if(UIManager.Instance.getCurrentScene() == null) {
-            SceneManager.LoadScene("BootScene");
             return;
         }
 

@@ -3,6 +3,7 @@ using Newtonsoft.Json;
 using PreGeppou.Data;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -17,12 +18,18 @@ public class ScrollViewManager : MonoBehaviour, IEnhancedScrollerDelegate {
     public static Button _cellViewPrefabButton;
     public static float _cellViewSize;
 
-
-    private void Start() {
+    private void Awake() {
         if (UIManager.Instance.getCurrentScene() == null) {
             return;
         }
+        gameObject.AddComponent<UIManagerAddComponentJigyousyoList>();
+    }
 
+    private void Start() {
+        if (UIManager.Instance.getCurrentScene() == null) {
+            SceneManager.LoadScene("BootScene");
+            return;
+        }
         // Scrollerにデリゲート登録
         _scroller.Delegate = this;
         // ReloadDataをするとビューが更新される
