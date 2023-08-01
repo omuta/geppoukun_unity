@@ -50,7 +50,10 @@ public class UIManagerAddComponentJigyousyoList : MonoBehaviour {
         // セルがインスタンス化されたときの処理
         ScrollViewManager._scroller.cellViewInstantiated += (scroller, view) => {
             var cellView = (CellViewJgyousyoRecord)view;
-            cellView.onClick = x => { 
+            cellView.onClick = x => {
+                SystemData systemData = new SystemData();
+                var filename = DataManager.makeTenkenFileNameYM(x.getTitle(), x.getSubTitle());
+                systemData = DataManager.readTenken(systemData, filename, true);
                 Debug.Log("Clicked: " + x.dataIndex); 
             };
         };

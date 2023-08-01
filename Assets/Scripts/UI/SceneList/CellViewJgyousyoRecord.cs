@@ -25,4 +25,12 @@ public class CellViewJgyousyoRecord : EnhancedScrollerCellView {
     private void Awake() {
         _button.onClick.AddListener(() => onClick?.Invoke(this));
     }
+
+    public string getTitle() {
+        return _title.text;
+    }
+
+    public string getSubTitle() {
+        return _subtitle.text;
+    }
 }

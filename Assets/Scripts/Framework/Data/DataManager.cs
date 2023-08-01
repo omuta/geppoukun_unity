@@ -20,8 +20,7 @@ using PreGeppou.Framework.Data;
 using PreGeppou.Keiyaku;
 using System.Text.Json;
 
-namespace PreGeppou.Data
-{
+namespace PreGeppou.Data {
     internal class DataManager {
         private static string FileNameJigyoujyou = "Jigyoujyou.json";
         private static string FileNameTenkou = "Tenkou.json";
@@ -90,9 +89,7 @@ namespace PreGeppou.Data
 
         // ファイルの有無を調べる
         public static bool existsTenken(SystemData systemData) {
-            //string path = getPath(context);
-            string path = ""; // TODO : パスを取得する
-            //File existsFile = new File(path + "/" + makeTenkenFileName(systemData));
+            string path = Common.getSystemPath();
             return File.Exists(path + "/" + makeTenkenFileName(systemData));
         }
 
@@ -342,37 +339,37 @@ namespace PreGeppou.Data
             return systemData.listTenkenKasyo;
         }
 
-	    // 点検情報書込み
-	    public static void writeTenkenKasyo(SystemData systemData) {
+        // 点検情報書込み
+        public static void writeTenkenKasyo(SystemData systemData) {
             try {
-                lock(DataManager.sDataLock) {
+                lock (DataManager.sDataLock) {
                     string fileName = makeTenkenKasyoFileName(systemData);
                     string stringJson = JsonSerializer.Serialize<List<TenkenKasyoData>>(systemData.listTenkenKasyo);//["shika",koala]
-                                                                                                                   // ファイル書き込み
+                                                                                                                    // ファイル書き込み
                     saveText(stringJson, fileName);
-			    }
-		    } catch (Exception e) {
+                }
+            } catch (Exception e) {
                 // Log.e(TAG, "Unable to write to file [writeTenkenKasyo]");
             }
-	    }
+        }
 
-	    public static string makeTenkenKasyoFileName(SystemData systemData) {
+        public static string makeTenkenKasyoFileName(SystemData systemData) {
             JigyousyoData jigyousyoData = systemData.listJigyousyo[systemData.positionJigyousyo];
             string fileName = jigyousyoData.getTextTitle() + "_" + jigyousyoData.getTextSubTitle() + "_TenkenKasyo.json";
             return fileName;
         }
 
-     //   public static FilenameFilter getFileExtensionFilter(string extension) {
-     //       string _extension = extension;
-     //       return new FilenameFilter() {
-     //           public bool accept(File file, string name) {
-     //               bool ret = name.endsWith(_extension);
-     //               return ret;
-     //           }
-     //       };
-	    //}
+        //   public static FilenameFilter getFileExtensionFilter(string extension) {
+        //       string _extension = extension;
+        //       return new FilenameFilter() {
+        //           public bool accept(File file, string name) {
+        //               bool ret = name.endsWith(_extension);
+        //               return ret;
+        //           }
+        //       };
+        //}
 
-	    public static void renameFile(string fileFrom, string fileTo) {
+        public static void renameFile(string fileFrom, string fileTo) {
             string path = Common.getSystemPath();
             if (File.Exists(path + fileFrom)) {
                 deleteFile(fileTo);
@@ -535,7 +532,7 @@ namespace PreGeppou.Data
                     // 推移表が「今月も含めた推移」か「先月からの推移」か？
                     if (systemData.tenkenData.flgSuiihyouKongetuStart == false) { // 先月から開始モード
                                                                                   // 先月からの推移であれば、今月のデータは推移表に設定しない
-                        if (Common.makeYM(getText(newSystemData.tenkenData.itemTenkenNijtijiYMD)) == 
+                        if (Common.makeYM(getText(newSystemData.tenkenData.itemTenkenNijtijiYMD)) ==
                             Common.makeYM(getText(systemData.tenkenData.itemTenkenNijtijiYMD)) && index == 0) {
                             //index++;
                             continue;
@@ -610,63 +607,63 @@ namespace PreGeppou.Data
         }
 
         public static string getText(Item item) {
-        if (item == null || item.text == null) {
-            return "";
+            if (item == null || item.text == null) {
+                return "";
+            }
+            return item.text;
         }
-        return item.text;
-    }
 
-    public static SystemData createKensinData(SystemData systemData) {
-        if (isEmpty(systemData.tenkenData.itemKensinKongetuHiduke)) {
+        public static SystemData createKensinData(SystemData systemData) {
+            if (isEmpty(systemData.tenkenData.itemKensinKongetuHiduke)) {
+                return systemData;
+            }
+            string dateKensin = systemData.tenkenData.itemKensinKongetuHiduke.text;
+            if (isNull(dateKensin) || dateKensin == "") {
+                return systemData;
+            }
+            // データ読込み・または生成
+            systemData.tenkenData.textKensinNijtijiYear = dateKensin.Substring(0, dateKensin.IndexOf("年"));
+            systemData.tenkenData.textKensinNijtijiMonth = dateKensin.Substring(dateKensin.IndexOf("年") + 1,
+                    dateKensin.IndexOf("月"));
+            systemData.tenkenData.textKensinNijtijiDay = dateKensin.Substring(dateKensin.IndexOf("月") + 1,
+                    dateKensin.IndexOf("日"));
             return systemData;
         }
-        string dateKensin = systemData.tenkenData.itemKensinKongetuHiduke.text;
-        if (isNull(dateKensin) || dateKensin == "") {
-            return systemData;
-        }
-        // データ読込み・または生成
-        systemData.tenkenData.textKensinNijtijiYear = dateKensin.Substring(0, dateKensin.IndexOf("年"));
-        systemData.tenkenData.textKensinNijtijiMonth = dateKensin.Substring(dateKensin.IndexOf("年") + 1,
-                dateKensin.IndexOf("月"));
-        systemData.tenkenData.textKensinNijtijiDay = dateKensin.Substring(dateKensin.IndexOf("月") + 1,
-                dateKensin.IndexOf("日"));
-        return systemData;
-    }
 
-    public static SystemData setKongetuSuiiData(SystemData systemData) {
-        if (systemData.tenkenData.flgSuiihyouKongetuStart == false)
-            return systemData;
-        string jyouritu = systemData.tenkenData.itemJyouritu.text;
+        public static SystemData setKongetuSuiiData(SystemData systemData) {
+            if (systemData.tenkenData.flgSuiihyouKongetuStart == false)
+                return systemData;
+            string jyouritu = systemData.tenkenData.itemJyouritu.text;
 
-        if (!isNull(systemData.tenkenData.itemKensinKongetuHiduke) && Common.isEmpty(systemData.tenkenData.textKakoTuki[0])) {
-            systemData.tenkenData.textKakoTuki[0] = toYYYYMM(systemData.tenkenData.itemKensinKongetuHiduke.text);
-        }
-        if (!isEmpty(systemData.tenkenData.itemKensinKongetuSaidaiDenryoku)
-                &&
-                (Common.isEmpty(systemData.tenkenData.textKakoDemandData[0]) || isZero(systemData.tenkenData.textKakoDemandData[0]))) {
-            systemData.tenkenData.textKakoDemandData[0] = Common.getMultiply(systemData.tenkenData.itemKensinKongetuSaidaiDenryoku.text, jyouritu, 0);
-        }
+            if (!isNull(systemData.tenkenData.itemKensinKongetuHiduke) && Common.isEmpty(systemData.tenkenData.textKakoTuki[0])) {
+                systemData.tenkenData.textKakoTuki[0] = toYYYYMM(systemData.tenkenData.itemKensinKongetuHiduke.text);
+            }
+            if (!isEmpty(systemData.tenkenData.itemKensinKongetuSaidaiDenryoku)
+                    &&
+                    (Common.isEmpty(systemData.tenkenData.textKakoDemandData[0]) || isZero(systemData.tenkenData.textKakoDemandData[0]))) {
+                systemData.tenkenData.textKakoDemandData[0] = Common.getMultiply(systemData.tenkenData.itemKensinKongetuSaidaiDenryoku.text, jyouritu, 0);
+            }
 
-        if (systemData.tenkenData.flgSuiihyouDenryokuryou == false) { // 月使用電力量が選択されている
-            if (!isEmpty(systemData.tenkenData.itemKensinDenryokuryou)) {
-                if (systemData.tenkenData.itemCheckboxYusen.text == "1") {
-                    systemData.tenkenData.textKakoSiyouDenryokuData[0] = systemData.tenkenData.itemKensinDenryokuryou.text;
-                } else {
-                    systemData.tenkenData.textKakoSiyouDenryokuData[0] = systemData.tenkenData.itemGenzaiDenryokuryou.text;
+            if (systemData.tenkenData.flgSuiihyouDenryokuryou == false) { // 月使用電力量が選択されている
+                if (!isEmpty(systemData.tenkenData.itemKensinDenryokuryou)) {
+                    if (systemData.tenkenData.itemCheckboxYusen.text == "1") {
+                        systemData.tenkenData.textKakoSiyouDenryokuData[0] = systemData.tenkenData.itemKensinDenryokuryou.text;
+                    } else {
+                        systemData.tenkenData.textKakoSiyouDenryokuData[0] = systemData.tenkenData.itemGenzaiDenryokuryou.text;
+                    }
+                }
+            } else { // 一日平均電力量が選択されている
+                if (!isEmpty(systemData.tenkenData.itemKensinHeikinDenryokuryou)) {
+                    if (systemData.tenkenData.itemCheckboxYusen.text == "1") {
+                        systemData.tenkenData.textKakoSiyouDenryokuData[0] = systemData.tenkenData.itemKensinHeikinDenryokuryou.text;
+                    } else {
+                        systemData.tenkenData.textKakoSiyouDenryokuData[0] = systemData.tenkenData.itemGenzaiHeikinDenryokuryou.text;
+                    }
                 }
             }
-        } else { // 一日平均電力量が選択されている
-            if (!isEmpty(systemData.tenkenData.itemKensinHeikinDenryokuryou)) {
-                if (systemData.tenkenData.itemCheckboxYusen.text == "1") {
-                    systemData.tenkenData.textKakoSiyouDenryokuData[0] = systemData.tenkenData.itemKensinHeikinDenryokuryou.text;
-                } else {
-                    systemData.tenkenData.textKakoSiyouDenryokuData[0] = systemData.tenkenData.itemGenzaiHeikinDenryokuryou.text;
-                }
-            }
-        }
 
-        return systemData;
-    }
+            return systemData;
+        }
 
         public static SystemData setSuiiData(SystemData systemData, SystemData orgSystemData, int index) {
             string jyouritu = systemData.tenkenData.itemJyouritu.text;
@@ -720,163 +717,171 @@ namespace PreGeppou.Data
             decimal? kensin4 = null;
             decimal? goukei = 0;
 
-        // 検針値と現在値のどちらを印刷するか？
-        if (equals(systemData.tenkenData.itemCheckboxYusen, "2")) { // 現在値を印刷する
-            if (isEmpty(systemData.tenkenData.itemGenzaiSengetu1) || isEmpty(systemData.tenkenData.itemGenzaiSengetu2) ||
-                       isEmpty(systemData.tenkenData.itemGenzaiSengetu3) || isEmpty(systemData.tenkenData.itemGenzaiSengetu4)) {
+            // 検針値と現在値のどちらを印刷するか？
+            if (equals(systemData.tenkenData.itemCheckboxYusen, "2")) { // 現在値を印刷する
+                if (isEmpty(systemData.tenkenData.itemGenzaiSengetu1) || isEmpty(systemData.tenkenData.itemGenzaiSengetu2) ||
+                           isEmpty(systemData.tenkenData.itemGenzaiSengetu3) || isEmpty(systemData.tenkenData.itemGenzaiSengetu4)) {
+                    return "";
+                }
+                if (isNumeric(systemData.tenkenData.itemGenzaiKongetu1)) {
+                    kensin1 = decimal.Parse(systemData.tenkenData.itemGenzaiKongetu1.text);
+                    kensin1 = kensin1 - decimal.Parse(systemData.tenkenData.itemGenzaiSengetu1.text);
+                    goukei = goukei + kensin1;
+                }
+                if (isNumeric(systemData.tenkenData.itemGenzaiKongetu2)) {
+                    kensin2 = decimal.Parse(systemData.tenkenData.itemGenzaiKongetu2.text);
+                    kensin2 = kensin2 - decimal.Parse(systemData.tenkenData.itemGenzaiSengetu2.text);
+                    goukei = goukei + kensin2;
+                }
+                if (isNumeric(systemData.tenkenData.itemGenzaiKongetu3)) {
+                    kensin3 = decimal.Parse(systemData.tenkenData.itemGenzaiKongetu3.text);
+                    kensin3 = kensin3 - (decimal.Parse(systemData.tenkenData.itemGenzaiSengetu3.text));
+                    goukei = goukei + kensin3;
+                }
+                if (isNumeric(systemData.tenkenData.itemGenzaiKongetu4)) {
+                    kensin4 = decimal.Parse(systemData.tenkenData.itemGenzaiKongetu4.text);
+                    kensin4 = kensin4 - decimal.Parse(systemData.tenkenData.itemGenzaiSengetu4.text);
+                    goukei = goukei + kensin4;
+                }
+            } else {
+                if (isEmpty(systemData.tenkenData.itemKensinSengetu1) || isEmpty(systemData.tenkenData.itemKensinSengetu2) ||
+                           isEmpty(systemData.tenkenData.itemKensinSengetu3) || isEmpty(systemData.tenkenData.itemKensinSengetu4)) {
+                    return "";
+                }
+                if (isNumeric(systemData.tenkenData.itemKensinKongetu1)) {
+                    kensin1 = decimal.Parse(systemData.tenkenData.itemKensinKongetu1.text);
+                    kensin1 = kensin1 - decimal.Parse(systemData.tenkenData.itemKensinSengetu1.text);
+                    goukei = goukei + kensin1;
+                }
+                if (isNumeric(systemData.tenkenData.itemKensinKongetu2)) {
+                    kensin2 = decimal.Parse(systemData.tenkenData.itemKensinKongetu2.text);
+                    kensin2 = kensin2 - decimal.Parse(systemData.tenkenData.itemKensinSengetu2.text);
+                    goukei = goukei + kensin2;
+                }
+                if (isNumeric(systemData.tenkenData.itemKensinKongetu3)) {
+                    kensin3 = decimal.Parse(systemData.tenkenData.itemKensinKongetu3.text);
+                    kensin3 = kensin3 - decimal.Parse(systemData.tenkenData.itemKensinSengetu3.text);
+                    goukei = goukei + kensin3;
+                }
+                if (isNumeric(systemData.tenkenData.itemKensinKongetu4)) {
+                    kensin4 = decimal.Parse(systemData.tenkenData.itemKensinKongetu4.text);
+                    kensin4 = kensin4 - decimal.Parse(systemData.tenkenData.itemKensinSengetu4.text);
+                    goukei = goukei + kensin4;
+                }
+            }
+            decimal? yakanritu = null;
+
+            decimal multiply100 = 100;
+            try {
+                if (keiyaku.getSyubetu() == 2) { // 夜間率計算
+                    yakanritu = Common.Round((decimal)(kensin4 / goukei), 2);
+                    yakanritu = yakanritu * multiply100;
+                } else if (keiyaku.getSyubetu() == 3) {
+                    decimal kyujitu = 0;
+                    kyujitu = (decimal)(kensin2 + kensin4);
+                    yakanritu = Common.Round((decimal)(kyujitu / goukei), 2);
+                    yakanritu = yakanritu * multiply100;
+                }
+            } catch (Exception e) {
                 return "";
             }
-            if (isNumeric(systemData.tenkenData.itemGenzaiKongetu1)) {
-                kensin1 = decimal.Parse(systemData.tenkenData.itemGenzaiKongetu1.text);
-                kensin1 = kensin1 - decimal.Parse(systemData.tenkenData.itemGenzaiSengetu1.text);
-                goukei = goukei + kensin1;
-            }
-            if (isNumeric(systemData.tenkenData.itemGenzaiKongetu2)) {
-                kensin2 = decimal.Parse(systemData.tenkenData.itemGenzaiKongetu2.text);
-                kensin2 = kensin2 - decimal.Parse(systemData.tenkenData.itemGenzaiSengetu2.text);
-                goukei = goukei + kensin2;
-            }
-            if (isNumeric(systemData.tenkenData.itemGenzaiKongetu3)) {
-                kensin3 = decimal.Parse(systemData.tenkenData.itemGenzaiKongetu3.text);
-                kensin3 = kensin3  - (decimal.Parse(systemData.tenkenData.itemGenzaiSengetu3.text));
-                goukei = goukei + kensin3;
-            }
-            if (isNumeric(systemData.tenkenData.itemGenzaiKongetu4)) {
-                kensin4 = decimal.Parse(systemData.tenkenData.itemGenzaiKongetu4.text);
-                kensin4 = kensin4 - decimal.Parse(systemData.tenkenData.itemGenzaiSengetu4.text);
-                goukei = goukei + kensin4;
-            }
-        } else {
-            if (isEmpty(systemData.tenkenData.itemKensinSengetu1) || isEmpty(systemData.tenkenData.itemKensinSengetu2) ||
-                       isEmpty(systemData.tenkenData.itemKensinSengetu3) || isEmpty(systemData.tenkenData.itemKensinSengetu4)) {
+            if (yakanritu != null) {
+                return yakanritu.ToString();
+            } else {
                 return "";
             }
-            if (isNumeric(systemData.tenkenData.itemKensinKongetu1)) {
-                kensin1 = decimal.Parse(systemData.tenkenData.itemKensinKongetu1.text);
-                kensin1 = kensin1 - decimal.Parse(systemData.tenkenData.itemKensinSengetu1.text);
-                goukei = goukei + kensin1;
-            }
-            if (isNumeric(systemData.tenkenData.itemKensinKongetu2)) {
-                kensin2 = decimal.Parse(systemData.tenkenData.itemKensinKongetu2.text);
-                kensin2 = kensin2 - decimal.Parse(systemData.tenkenData.itemKensinSengetu2.text);
-                goukei = goukei + kensin2;
-            }
-            if (isNumeric(systemData.tenkenData.itemKensinKongetu3)) {
-                kensin3 = decimal.Parse(systemData.tenkenData.itemKensinKongetu3.text);
-                kensin3 = kensin3 - decimal.Parse(systemData.tenkenData.itemKensinSengetu3.text);
-                goukei = goukei + kensin3;
-            }
-            if (isNumeric(systemData.tenkenData.itemKensinKongetu4)) {
-                kensin4 = decimal.Parse(systemData.tenkenData.itemKensinKongetu4.text);
-                kensin4 = kensin4 - decimal.Parse(systemData.tenkenData.itemKensinSengetu4.text);
-                goukei = goukei + kensin4;
-            }
         }
-        decimal? yakanritu = null;
 
-        decimal multiply100 = 100;
-        try {
-            if (keiyaku.getSyubetu() == 2) { // 夜間率計算
-                yakanritu = Common.Round((decimal)(kensin4 / goukei), 2);
-                yakanritu = yakanritu * multiply100;
-            } else if (keiyaku.getSyubetu() == 3) {
-                decimal kyujitu = 0;
-                kyujitu = (decimal)(kensin2 + kensin4);
-                yakanritu = Common.Round((decimal)(kyujitu / goukei), 2);
-                yakanritu = yakanritu * multiply100;
+        // 点検データを新規作成する
+        public static SystemData remakeTenkenData(SystemData systemData) {
+            TenkenData newTenkenData = systemData.tenkenData;
+            //		for(int i=0; i<systemData.tenkenData.textKakoSiyouDenryokuData.length-1; i++){
+            //			newTenkenData.textKakoTuki[i+1] = systemData.tenkenData.textKakoTuki[i];
+            //			newTenkenData.textKakoSiyouDenryokuData[i+1] = systemData.tenkenData.textKakoSiyouDenryokuData[i];
+            //		}
+            if (systemData.tenkenData.flgSuiihyouKongetuStart == true) {
+                string jyouritu = systemData.tenkenData.itemJyouritu.text;
+                // 今月分も含む推移であれば、今月のデータを推移表に設定する
+                newTenkenData.textKakoTuki[0] = systemData.tenkenYM;
+                newTenkenData.textKakoSiyouDenryokuData[0] = systemData.tenkenData.itemKensinDenryokuryou.text;
+                newTenkenData.textKakoDemandData[0] = Common.getMultiply(systemData.tenkenData.itemKensinKongetuSaidaiDenryoku.text, jyouritu, 0);
             }
-        } catch (Exception e) {
-            return "";
+            systemData.tenkenData = newTenkenData;
+            return systemData;
         }
-        if (yakanritu != null) {
-            return yakanritu.ToString();
-        } else {
-            return "";
-        }
-    }
 
-    // 点検データを新規作成する
-    public static SystemData remakeTenkenData(SystemData systemData) {
-        TenkenData newTenkenData = systemData.tenkenData;
-        //		for(int i=0; i<systemData.tenkenData.textKakoSiyouDenryokuData.length-1; i++){
-        //			newTenkenData.textKakoTuki[i+1] = systemData.tenkenData.textKakoTuki[i];
-        //			newTenkenData.textKakoSiyouDenryokuData[i+1] = systemData.tenkenData.textKakoSiyouDenryokuData[i];
-        //		}
-        if (systemData.tenkenData.flgSuiihyouKongetuStart == true) {
-            string jyouritu = systemData.tenkenData.itemJyouritu.text;
-            // 今月分も含む推移であれば、今月のデータを推移表に設定する
-            newTenkenData.textKakoTuki[0] = systemData.tenkenYM;
-            newTenkenData.textKakoSiyouDenryokuData[0] = systemData.tenkenData.itemKensinDenryokuryou.text;
-            newTenkenData.textKakoDemandData[0] = Common.getMultiply(systemData.tenkenData.itemKensinKongetuSaidaiDenryoku.text, jyouritu, 0);
+        public static string getNowYM() {
+            return DateTime.Now.ToString("yyyy_MM");
         }
-        systemData.tenkenData = newTenkenData;
-        return systemData;
-    }
 
-            public static string getNowYM() {
-                return DateTime.Now.ToString("yyyy_MM");
+        //public static string getSDCardPath() {
+        //    return Environment.getExternalStorageDirectory().tostring() + "/geppou/cyouhyou";
+        //}
+
+        public static SystemData getTenkenYM(SystemData systemData) {
+            // TODO:今月の作業を完了した場合は次月を設定するように機能を追加する
+            systemData.tenkenYM = DateTime.Now.ToString("yyyy/MM");
+            return systemData;
+        }
+
+        public static string makeYMD() {
+            // TODO:今月の作業を完了した場合は次月を設定するように機能を追加する
+            return Common.makeYMD();
+            // return Common.makeNextYMD();
+        }
+
+        public static string makeTenkenFileNameYM(SystemData systemData, DateTime calendar) {
+            JigyousyoData jigyousyoData = systemData.listJigyousyo[systemData.positionJigyousyo];
+            string TenkenFileName = jigyousyoData.getTextTitle() + "_" + jigyousyoData.getTextSubTitle() + "_" + Common.makeYMD2(calendar) + ".dat";
+            TenkenFileName = TenkenFileName.Replace("(", "（").Replace(")", "）").Replace("{", "｛").Replace("}", "｝")
+                                           .Replace("[", "［").Replace("]", "］").Replace("-", "－");
+            return TenkenFileName;
+        }
+
+        public static string makeTenkenFileNameYM(string title, string subtitle) {
+            DateTime dateTime = DateTime.Now;
+            string TenkenFileName = title + "_" + subtitle + "_" + Common.makeYMD2(dateTime) + ".dat";
+            TenkenFileName = TenkenFileName.Replace("(", "（").Replace(")", "）").Replace("{", "｛").Replace("}", "｝")
+                                           .Replace("[", "［").Replace("]", "］").Replace("-", "－");
+            return TenkenFileName;
+        }
+
+        public static string makeTenkenFileNameAsterisk(SystemData systemData) {
+            JigyousyoData jigyousyoData = systemData.listJigyousyo[systemData.positionJigyousyo];
+            string TenkenFileName = jigyousyoData.getTextTitle() + "_" + jigyousyoData.getTextSubTitle() + "_*" + ".dat";
+            TenkenFileName = TenkenFileName.Replace("(", "（").Replace(")", "）").Replace("{", "｛").Replace("}", "｝")
+                                           .Replace("[", "［").Replace("]", "］").Replace("-", "－");
+            return TenkenFileName;
+        }
+
+
+        public static string makeTenkenImageFileNameAsterisk(SystemData systemData) {
+            JigyousyoData jigyousyoData = systemData.listJigyousyo[systemData.positionJigyousyo];
+            string TenkenFileName = jigyousyoData.getTextTitle() + "_" + jigyousyoData.getTextSubTitle() + "_*" + ".png";
+            TenkenFileName = TenkenFileName.Replace("(", "（").Replace(")", "）").Replace("{", "｛").Replace("}", "｝")
+                                           .Replace("[", "［").Replace("]", "］").Replace("-", "－");
+            return TenkenFileName;
+        }
+
+        public static string makeTenkenFileNameSameMonthLastYear(SystemData systemData) {
+            string[] param;
+            string thisMonth = "";
+            string sameMonthLastYear = "";
+            string TenkenFileName = "";
+            if (systemData.tenkenFileName != null) {
+                param = Common.getPreffix(systemData.tenkenFileName).Split("_");
+                if (0 < param.Length) {
+                    thisMonth = param[2];
+                    DateTime calendar;
+                    calendar = new DateTime(int.Parse(thisMonth.Substring(0, 4)), int.Parse(thisMonth.Substring(4, 6)), 1);
+                    sameMonthLastYear = calendar.AddYears(-1).ToString("yyyyMMdd");
+                    JigyousyoData jigyousyoData = systemData.listJigyousyo[systemData.positionJigyousyo];
+                    TenkenFileName = jigyousyoData.getTextTitle() + "_" + jigyousyoData.getTextSubTitle() + "_"
+                            + sameMonthLastYear + ".dat";
+                }
             }
-
-    //public static string getSDCardPath() {
-    //    return Environment.getExternalStorageDirectory().tostring() + "/geppou/cyouhyou";
-    //}
-
-    public static SystemData getTenkenYM(SystemData systemData) {
-        // TODO:今月の作業を完了した場合は次月を設定するように機能を追加する
-        systemData.tenkenYM = DateTime.Now.ToString("yyyy/MM");
-        return systemData;
-    }
-
-    public static string makeYMD() {
-        // TODO:今月の作業を完了した場合は次月を設定するように機能を追加する
-        return Common.makeYMD();
-        // return Common.makeNextYMD();
-    }
-
-    public static string makeTenkenFileNameYM(SystemData systemData, DateTime calendar) {
-        JigyousyoData jigyousyoData = systemData.listJigyousyo[systemData.positionJigyousyo];
-        string TenkenFileName = jigyousyoData.getTextTitle() + "_" + jigyousyoData.getTextSubTitle() + "_" + Common.makeYMD2(calendar) + ".dat";
-        TenkenFileName = TenkenFileName.Replace("(", "\\(").Replace(")", "\\)").Replace("{", "\\{").Replace("}", "\\}")
-                                       .Replace("[", "\\[").Replace("]", "\\]").Replace("-", "\\-");
-        return TenkenFileName;
-    }
-
-    public static string makeTenkenFileNameAsterisk(SystemData systemData) {
-        JigyousyoData jigyousyoData = systemData.listJigyousyo[systemData.positionJigyousyo];
-        string TenkenFileName = jigyousyoData.getTextTitle() + "_" + jigyousyoData.getTextSubTitle() + "_*" + ".dat";
-        TenkenFileName = TenkenFileName.Replace("(", "\\(").Replace(")", "\\)").Replace("{", "\\{").Replace("}", "\\}")
-                                       .Replace("[", "\\[").Replace("]", "\\]").Replace("-", "\\-");
-        return TenkenFileName;
-    }
-
-
-    public static string makeTenkenImageFileNameAsterisk(SystemData systemData) {
-        JigyousyoData jigyousyoData = systemData.listJigyousyo[systemData.positionJigyousyo];
-        string TenkenFileName = jigyousyoData.getTextTitle() + "_" + jigyousyoData.getTextSubTitle() + "_*" + ".png";
-        TenkenFileName = TenkenFileName.Replace("(", "\\(").Replace(")", "\\)").Replace("{", "\\{").Replace("}", "\\}")
-                                       .Replace("[", "\\[").Replace("]", "\\]").Replace("-", "\\-");
-        return TenkenFileName;
-    }
-
-    public static string makeTenkenFileNameSameMonthLastYear(SystemData systemData) {
-        string[] param;
-        string thisMonth = "";
-        string sameMonthLastYear = "";
-        string TenkenFileName = "";
-        if (systemData.tenkenFileName != null) {
-            param = Common.getPreffix(systemData.tenkenFileName).Split("_");
-            if (0 < param.Length) {
-                thisMonth = param[2];
-                DateTime calendar;
-                calendar = new DateTime(int.Parse(thisMonth.Substring(0, 4)), int.Parse(thisMonth.Substring(4, 6)), 1);
-                sameMonthLastYear = calendar.AddYears(-1).ToString("yyyyMMdd");
-                JigyousyoData jigyousyoData = systemData.listJigyousyo[systemData.positionJigyousyo];
-                TenkenFileName = jigyousyoData.getTextTitle() + "_" + jigyousyoData.getTextSubTitle() + "_"
-                        + sameMonthLastYear + ".dat";
-            }
+            return TenkenFileName;
         }
-        return TenkenFileName;
-    }
 
         public static string makeTenkenFileName(SystemData systemData) {
             JigyousyoData jigyousyoData = systemData.listJigyousyo[systemData.positionJigyousyo];
@@ -951,158 +956,158 @@ namespace PreGeppou.Data
         // 天候情報書込み
         public static void writeTenkou(List<TenkouData> list) {
             try {
-                lock(DataManager.sDataLock) {
-                    if(list !=  null) {
+                lock (DataManager.sDataLock) {
+                    if (list != null) {
                         string stringJson = JsonSerializer.Serialize(list); //["shika",koala]
-                                                                                         // ファイル書き込み
+                                                                            // ファイル書き込み
                         saveText(stringJson, FileNameTenkou);
                     }
                 }
-		    } catch (Exception e) {
+            } catch (Exception e) {
                 //Log.e(TAG, "Unable to write to file [writeTenkou]");
             }
-	    }
-
-	// 点検箇所情報読み込み
-	//	public static List<TenkenKasyoData> readTenkenKasyo(Activity activity, SystemData systemData){
-	//		try{
-	//			List<TenkenKasyoData> retList = new List<TenkenKasyoData>();
-	//			synchronized (FilesBackupAgent.sDataLock) {
-	//				List<TenkenKasyoData> tenkenKasyoData = null;
-	//				Type listOfTenkouData = new TypeToken<List<TenkenKasyoData>>(){}.getType();
-	//				string data = null;
-	//				Gson gson = new Gson();
-	//				try {
-	//					data = loadText(activity, FileNameTenkenKasyo);
-	//					if(data.equals("null")){
-	//						deleteFile(activity, FileNameTenkenKasyo);
-	//						return null;
-	//					}
-	//					tenkenKasyoData = Collections.synchronizedList((List<TenkenKasyoData>)gson.fromJson(data, listOfTenkouData));
-	//				} catch (IOException e) {
-	//					e.printStackTrace();
-	//					for(string tenkenKasyo : defaultTenkenKasyo){
-	//						TenkenKasyoData jigyoujyou = new TenkenKasyoData(new Item(tenkenKasyo), 0, 0, 0);
-	//						retList.add(jigyoujyou);
-	//					}
-	//					return retList;
-	//				}
-	//				for(TenkenKasyoData jigyoujyou : tenkenKasyoData){
-	//					retList.add(jigyoujyou);
-	//				}
-	//			}
-	//			systemData.listTenkenKasyo = retList;
-	//		} catch (Exception e) {
-	//		    Log.e(TAG, "Unable to write to file [writeTenkou]");
-	//	    }
-	//		return systemData.listTenkenKasyo;
-	//	}
-
-	// 点検箇所情報書込み
-	public static void writeTenkenKasyo(List<TenkenKasyoData> list, int dummy) {
-        try {
-            lock(DataManager.sDataLock) {
-                string stringJson;
-                stringJson = JsonSerializer.Serialize(list); //["shika",koala]
-                                                            // ファイル書き込み
-                saveText(stringJson, FileNameTenkenKasyo);
-		    }
-	    } catch (Exception e) {
-            //Log.e(TAG, "Unable to write to file [writeTenkou]");
         }
-	}
 
-	// 点検記号情報読み込み
-	public static List<TenkenKigouData> readTenkenKigou(SystemData systemData) {
-        List<TenkenKigouData> retList = new List<TenkenKigouData>();
-        try {
-            lock(DataManager.sDataLock) {
-                List<TenkenKigouData> tenkenKigouData = null;
-                string data = null;
-                try {
-                    data = loadText(FileNameTenkenKigou);
-                    if (data == "null") {
-                        deleteFile(FileNameTenkenKigou);
+        // 点検箇所情報読み込み
+        //	public static List<TenkenKasyoData> readTenkenKasyo(Activity activity, SystemData systemData){
+        //		try{
+        //			List<TenkenKasyoData> retList = new List<TenkenKasyoData>();
+        //			synchronized (FilesBackupAgent.sDataLock) {
+        //				List<TenkenKasyoData> tenkenKasyoData = null;
+        //				Type listOfTenkouData = new TypeToken<List<TenkenKasyoData>>(){}.getType();
+        //				string data = null;
+        //				Gson gson = new Gson();
+        //				try {
+        //					data = loadText(activity, FileNameTenkenKasyo);
+        //					if(data.equals("null")){
+        //						deleteFile(activity, FileNameTenkenKasyo);
+        //						return null;
+        //					}
+        //					tenkenKasyoData = Collections.synchronizedList((List<TenkenKasyoData>)gson.fromJson(data, listOfTenkouData));
+        //				} catch (IOException e) {
+        //					e.printStackTrace();
+        //					for(string tenkenKasyo : defaultTenkenKasyo){
+        //						TenkenKasyoData jigyoujyou = new TenkenKasyoData(new Item(tenkenKasyo), 0, 0, 0);
+        //						retList.add(jigyoujyou);
+        //					}
+        //					return retList;
+        //				}
+        //				for(TenkenKasyoData jigyoujyou : tenkenKasyoData){
+        //					retList.add(jigyoujyou);
+        //				}
+        //			}
+        //			systemData.listTenkenKasyo = retList;
+        //		} catch (Exception e) {
+        //		    Log.e(TAG, "Unable to write to file [writeTenkou]");
+        //	    }
+        //		return systemData.listTenkenKasyo;
+        //	}
+
+        // 点検箇所情報書込み
+        public static void writeTenkenKasyo(List<TenkenKasyoData> list, int dummy) {
+            try {
+                lock (DataManager.sDataLock) {
+                    string stringJson;
+                    stringJson = JsonSerializer.Serialize(list); //["shika",koala]
+                                                                 // ファイル書き込み
+                    saveText(stringJson, FileNameTenkenKasyo);
+                }
+            } catch (Exception e) {
+                //Log.e(TAG, "Unable to write to file [writeTenkou]");
+            }
+        }
+
+        // 点検記号情報読み込み
+        public static List<TenkenKigouData> readTenkenKigou(SystemData systemData) {
+            List<TenkenKigouData> retList = new List<TenkenKigouData>();
+            try {
+                lock (DataManager.sDataLock) {
+                    List<TenkenKigouData> tenkenKigouData = null;
+                    string data = null;
+                    try {
+                        data = loadText(FileNameTenkenKigou);
+                        if (data == "null") {
+                            deleteFile(FileNameTenkenKigou);
+                            return null;
+                        }
+                        tenkenKigouData = JsonSerializer.Deserialize<List<TenkenKigouData>>(data);
+                    } catch (IOException e) {
+                        //e.printStackTrace();
                         return null;
                     }
-                    tenkenKigouData = JsonSerializer.Deserialize<List<TenkenKigouData>>(data);
-                } catch (IOException e) {
-                    //e.printStackTrace();
-                    return null;
+                    foreach (TenkenKigouData jigyoujyou in tenkenKigouData) {
+                        retList.Add(jigyoujyou);
+                    }
+                    systemData.listTenkenKigou = retList;
                 }
-                foreach (TenkenKigouData jigyoujyou in tenkenKigouData) {
-                    retList.Add(jigyoujyou);
+            } catch (Exception e) {
+                //Log.e(TAG, "Unable to read to file [readTenkenKigou]");
+            }
+            return systemData.listTenkenKigou;
+        }
+
+        // 点検記号情報書込み
+        public static void writeTenkenKigou(List<TenkenKigouData> list) {
+            try {
+                lock (DataManager.sDataLock) {
+                    string stringJson;
+                    stringJson = JsonSerializer.Serialize(list); //["shika",koala]
+                                                                 // ファイル書き込み
+                    saveText(stringJson, FileNameTenkenKigou);
                 }
-                systemData.listTenkenKigou = retList;
-		    }
-	    } catch (Exception e) {
-            //Log.e(TAG, "Unable to read to file [readTenkenKigou]");
+            } catch (Exception e) {
+                //Log.e(TAG, "Unable to write to file [writeTenkenKigou]");
+            }
         }
-        return systemData.listTenkenKigou;
-	}
 
-	// 点検記号情報書込み
-	public static void writeTenkenKigou(List<TenkenKigouData> list) {
-        try {
-            lock(DataManager.sDataLock) {
-                string stringJson;
-                stringJson = JsonSerializer.Serialize(list); //["shika",koala]
-                                                            // ファイル書き込み
-                saveText(stringJson, FileNameTenkenKigou);
-		    }
-	    } catch (Exception e) {
-            //Log.e(TAG, "Unable to write to file [writeTenkenKigou]");
-        }
-	}
-
-	// 点検記号情報読み込み
-	public static List<TeikeibunData> readTenkenTeikeibun(SystemData systemData) {
-        try {
-            lock(DataManager.sDataLock) {
-                List<TeikeibunData> retList = new List<TeikeibunData>();
-                List<TeikeibunData> tenkenKigouData = null;
-                string data = null;
-                try {
-                    data = loadText(FileNameTenkenKigou);
-                    if (data == "null") {
-                        deleteFile(FileNameTenkenKasyo);
+        // 点検記号情報読み込み
+        public static List<TeikeibunData> readTenkenTeikeibun(SystemData systemData) {
+            try {
+                lock (DataManager.sDataLock) {
+                    List<TeikeibunData> retList = new List<TeikeibunData>();
+                    List<TeikeibunData> tenkenKigouData = null;
+                    string data = null;
+                    try {
+                        data = loadText(FileNameTenkenKigou);
+                        if (data == "null") {
+                            deleteFile(FileNameTenkenKasyo);
+                            return null;
+                        }
+                        tenkenKigouData = JsonSerializer.Deserialize<List<TeikeibunData>>(data);
+                    } catch (IOException e) {
+                        //e.printStackTrace();
                         return null;
                     }
-                    tenkenKigouData = JsonSerializer.Deserialize<List<TeikeibunData>>(data);
-                } catch (IOException e) {
-                    //e.printStackTrace();
-                    return null;
+                    foreach (TeikeibunData jigyoujyou in tenkenKigouData) {
+                        retList.Add(jigyoujyou);
+                    }
+                    systemData.listTenkenTeikeibun = retList;
                 }
-                foreach (TeikeibunData jigyoujyou in tenkenKigouData) {
-                    retList.Add(jigyoujyou);
+            } catch (Exception e) {
+                //Log.e(TAG, "Unable to read to file [readTenkenTeikeibun]");
+            }
+            return systemData.listTenkenTeikeibun;
+        }
+
+        // 点検記号情報書込み
+        public static void writeTenkenTeikeibun(List<TeikeibunData> list) {
+            try {
+                lock (DataManager.sDataLock) {
+                    string stringJson;
+                    stringJson = JsonSerializer.Serialize(list); //["shika",koala]
+                                                                 // ファイル書き込み
+                    saveText(stringJson, FileNameTenkenKigou);
                 }
-                systemData.listTenkenTeikeibun = retList;
-		    }
-	    } catch (Exception e) {
-            //Log.e(TAG, "Unable to read to file [readTenkenTeikeibun]");
+            } catch (Exception e) {
+                //Log.e(TAG, "Unable to write to file [writeTenkenTeikeibun]");
+            }
         }
-        return systemData.listTenkenTeikeibun;
-	}
 
-	// 点検記号情報書込み
-	public static void writeTenkenTeikeibun(List<TeikeibunData> list) {
-        try {
-            lock(DataManager.sDataLock) {
-                string stringJson;
-                stringJson = JsonSerializer.Serialize(list); //["shika",koala]
-                                                            // ファイル書き込み
-                saveText(stringJson, FileNameTenkenKigou);
-		    }
-	    } catch (Exception e) {
-            //Log.e(TAG, "Unable to write to file [writeTenkenTeikeibun]");
-        }
-	}
-
-	// 点検者情報読み込み
-	public static TenkensyaData readTenkensya(SystemData systemData) {
+        // 点検者情報読み込み
+        public static TenkensyaData readTenkensya(SystemData systemData) {
             TenkensyaData tenkensyaData = null;
             try {
-                lock(DataManager.sDataLock) {
+                lock (DataManager.sDataLock) {
                     string data = string.Empty;
                     try {
                         data = loadText(FileNameTenkensya);
@@ -1111,122 +1116,122 @@ namespace PreGeppou.Data
                             return new TenkensyaData("", 0, 0, 0);
                         }
                         tenkensyaData = (TenkensyaData)JsonSerializer.Deserialize<TenkensyaData>(data);
-			} catch (IOException e) {
-                //e.printStackTrace();
-                return new TenkensyaData("", 0, 0, 0);
-            }
-            systemData.tenkensyaData = tenkensyaData;
-			    }
-		    } catch (Exception e) {
+                    } catch (IOException e) {
+                        //e.printStackTrace();
+                        return new TenkensyaData("", 0, 0, 0);
+                    }
+                    systemData.tenkensyaData = tenkensyaData;
+                }
+            } catch (Exception e) {
                 //Log.e(TAG, "Unable to read to file [readTenkensya]");
             }
             return systemData.tenkensyaData;
-	}
-
-	// 点検者情報書込み
-	public static void writeTenkensya(TenkensyaData tenkensyaData) {
-        try {
-            lock(DataManager.sDataLock) {
-                string stringJson;
-                stringJson = JsonSerializer.Serialize(tenkensyaData);
-                // ファイル書き込み
-                saveText(stringJson, FileNameTenkensya);
-		    }
-	    } catch (Exception e) {
-            //Log.e(TAG, "Unable to write to file [writeTenkensya]");
         }
-	}
 
-	// システム設定情報読み込み
-	public static SystemData readSettei(SystemData systemData) {
-    try {
-        lock(DataManager.sDataLock) {
-            //SdLog.i("readSettei");
-            SetteiData setteiData = new SetteiData("");
-            string data = null;
+        // 点検者情報書込み
+        public static void writeTenkensya(TenkensyaData tenkensyaData) {
             try {
-                data = loadText(FileNameSettei);
-                //SdLog2.i("data:" + data);
-                if (data == null) {
-                    deleteFile(FileNameSettei);
-                    return null;
+                lock (DataManager.sDataLock) {
+                    string stringJson;
+                    stringJson = JsonSerializer.Serialize(tenkensyaData);
+                    // ファイル書き込み
+                    saveText(stringJson, FileNameTenkensya);
                 }
-                setteiData = (SetteiData)JsonSerializer.Deserialize<SetteiData>(data);
-                // setteiDataが空の場合は、3を設定する
-                if (setteiData == null) {
-                    //SdLog2.i("setteiData==null:" + data);
-                    setteiData = new SetteiData("");
-                    setteiData.textKensinKeta = "3";
-                    setteiData.textPrintKigouSize = "20";
-                }
-                if (Common.isEmpty(setteiData.textKensinKeta)) {
-                    //SdLog2.i("setteiData.textKensinKeta == null:" + data);
-                    setteiData.textKensinKeta = "3";
-                }
-                if (Common.isEmpty(setteiData.textPrintKigouSize)) {
-                    //SdLog2.i("setteiData.textPrintKigouSize == null:" + data);
-                    setteiData.textPrintKigouSize = "20";
-                }
-                if (setteiData.screenOffTimeout == null) {
-                    //SdLog2.i("setteiData.screenOffTimeout == null:" + data);
-                    setteiData.screenOffTimeout = 15;
-                }
-			} catch (IOException e) {
-                setteiData.textKensinKeta = "3";
-                //e.printStackTrace();
-                return systemData;
+            } catch (Exception e) {
+                //Log.e(TAG, "Unable to write to file [writeTenkensya]");
             }
-            systemData.settei = setteiData;
-		}
-		} catch (Exception e) {
-            //Log.e(TAG, "Unable to write to file [readSettei]");
         }
-        return systemData;
-	}
 
-	// システム設定情報書込み
-	public static void writeSettei(SetteiData setteiData) {
-        try {
-            lock(DataManager.sDataLock) {
-                string stringJson;
-                stringJson = JsonSerializer.Serialize(setteiData);
-                // ファイル書き込み
-                saveText(stringJson, FileNameSettei);
-		    }
-	    } catch (Exception e) {
-            //Log.e(TAG, "Unable to write to file [readSettei]");
-        }
-	}
-
-	// システム設定情報読み込み
-	public static SystemData readWareki(SystemData systemData) {
-    try {
-        lock(DataManager.sDataLock) {
-            //SdLog.i("readWareki");
-            WarekiData warekiData = new WarekiData();
-            string data = null;
+        // システム設定情報読み込み
+        public static SystemData readSettei(SystemData systemData) {
             try {
-                data = loadText(FileNameWareki);
-                //SdLog2.i("data:" + data);
-                if (data == null) {
-                    deleteFile(FileNameWareki);
-                    return null;
+                lock (DataManager.sDataLock) {
+                    //SdLog.i("readSettei");
+                    SetteiData setteiData = new SetteiData("");
+                    string data = null;
+                    try {
+                        data = loadText(FileNameSettei);
+                        //SdLog2.i("data:" + data);
+                        if (data == null) {
+                            deleteFile(FileNameSettei);
+                            return null;
+                        }
+                        setteiData = (SetteiData)JsonSerializer.Deserialize<SetteiData>(data);
+                        // setteiDataが空の場合は、3を設定する
+                        if (setteiData == null) {
+                            //SdLog2.i("setteiData==null:" + data);
+                            setteiData = new SetteiData("");
+                            setteiData.textKensinKeta = "3";
+                            setteiData.textPrintKigouSize = "20";
+                        }
+                        if (Common.isEmpty(setteiData.textKensinKeta)) {
+                            //SdLog2.i("setteiData.textKensinKeta == null:" + data);
+                            setteiData.textKensinKeta = "3";
+                        }
+                        if (Common.isEmpty(setteiData.textPrintKigouSize)) {
+                            //SdLog2.i("setteiData.textPrintKigouSize == null:" + data);
+                            setteiData.textPrintKigouSize = "20";
+                        }
+                        if (setteiData.screenOffTimeout == null) {
+                            //SdLog2.i("setteiData.screenOffTimeout == null:" + data);
+                            setteiData.screenOffTimeout = 15;
+                        }
+                    } catch (IOException e) {
+                        setteiData.textKensinKeta = "3";
+                        //e.printStackTrace();
+                        return systemData;
+                    }
+                    systemData.settei = setteiData;
                 }
-                warekiData = (WarekiData)JsonSerializer.Deserialize<SystemData>(data);
-					//warekiData = (WarekiData) gson.fromJson(data, WarekiData.class);
-				} catch (IOException e) {
-                //e.printStackTrace();
-                return systemData;
+            } catch (Exception e) {
+                //Log.e(TAG, "Unable to write to file [readSettei]");
             }
-                systemData.wareki = warekiData;
-			}
-			//		} catch (InvocationTargetException e){
-			//		    Log.e(TAG, "Unable to write to file [readSettei]");
-		} catch (Exception e) {
-            //Log.e(TAG, "Unable to write to file [readSettei]");
+            return systemData;
         }
-        return systemData;
-	}
+
+        // システム設定情報書込み
+        public static void writeSettei(SetteiData setteiData) {
+            try {
+                lock (DataManager.sDataLock) {
+                    string stringJson;
+                    stringJson = JsonSerializer.Serialize(setteiData);
+                    // ファイル書き込み
+                    saveText(stringJson, FileNameSettei);
+                }
+            } catch (Exception e) {
+                //Log.e(TAG, "Unable to write to file [readSettei]");
+            }
+        }
+
+        // システム設定情報読み込み
+        public static SystemData readWareki(SystemData systemData) {
+            try {
+                lock (DataManager.sDataLock) {
+                    //SdLog.i("readWareki");
+                    WarekiData warekiData = new WarekiData();
+                    string data = null;
+                    try {
+                        data = loadText(FileNameWareki);
+                        //SdLog2.i("data:" + data);
+                        if (data == null) {
+                            deleteFile(FileNameWareki);
+                            return null;
+                        }
+                        warekiData = (WarekiData)JsonSerializer.Deserialize<SystemData>(data);
+                        //warekiData = (WarekiData) gson.fromJson(data, WarekiData.class);
+                    } catch (IOException e) {
+                        //e.printStackTrace();
+                        return systemData;
+                    }
+                    systemData.wareki = warekiData;
+                }
+                //		} catch (InvocationTargetException e){
+                //		    Log.e(TAG, "Unable to write to file [readSettei]");
+            } catch (Exception e) {
+                //Log.e(TAG, "Unable to write to file [readSettei]");
+            }
+            return systemData;
+        }
 
         // システム設定情報書込み
         public static void writeWareki(WarekiData warekiData) {
@@ -1279,25 +1284,25 @@ namespace PreGeppou.Data
                         copy(file, toName);
                         deleteFile(fromFileName);
                     } catch (IOException e) {
+                    }
                 }
             }
         }
-	}
 
-	/**
-	  * ファイルをコピーします。
-	  * @param file コピー元ファイル
-	  * @param newFileName コピー先ファイル名
-	  */
-	    private static void copy(string file, string newFileName) {
-                try {
-                    string text = File.ReadAllText(file);
-                    File.WriteAllText(newFileName, text);
-                } catch (FileNotFoundException e) {
-                    //e.printStackTrace();
-                } catch (IOException e) {
-                    //e.printStackTrace();
-                }
+        /**
+          * ファイルをコピーします。
+          * @param file コピー元ファイル
+          * @param newFileName コピー先ファイル名
+          */
+        private static void copy(string file, string newFileName) {
+            try {
+                string text = File.ReadAllText(file);
+                File.WriteAllText(newFileName, text);
+            } catch (FileNotFoundException e) {
+                //e.printStackTrace();
+            } catch (IOException e) {
+                //e.printStackTrace();
+            }
         }
 
         public static string loadText(string FileName) {
@@ -1319,25 +1324,25 @@ namespace PreGeppou.Data
             string[] files = Directory.GetFiles(path, fileNameAsterisk);
             Array.Sort(files);
 
-                foreach (string file in files) {
+            foreach (string file in files) {
                 try {
                     deleteFile(file);
                 } catch (IOException e) {
                     //e.printStackTrace();
                 }
             }
-	    }
+        }
 
-	    public static void deleteFile(string FileName){
-		    try {
+        public static void deleteFile(string FileName) {
+            try {
                 string path = Common.getSystemPath();
-                lock(DataManager.sDataLock) {
+                lock (DataManager.sDataLock) {
                     File.Delete(Path.Combine(path, FileName));
                 }
             } catch (Exception e) {
                 // Log.e(TAG, "Unable to delete file [deleteFile]");
             }
-		    return;
+            return;
         }
 
         // フリーフォーマット出力用ファイルバックアップ処理
@@ -1347,7 +1352,7 @@ namespace PreGeppou.Data
             try {
                 if (Common.isEmpty(textCyouhyouFreeFormatFlag) ||
                         textCyouhyouFreeFormatFlag == "0") { // フリーフォーマット帳票設定OFF
-                                                                  // なにもしない
+                                                             // なにもしない
                 } else {
                     // フリーフォーマットファイルを月報くんのディレクトリにコピーする
                     string filePathNameFrom = Path.Combine(textCyouhyouFreeFormatFilePath, textCyouhyouFreeFormatFileName);
@@ -1490,7 +1495,7 @@ namespace PreGeppou.Data
 
         public static bool checkBillingGeppou() {
             // TODO 課金チェック
-            
+
             //if (Debug.isDebuggerConnected()) {
             //    return true;
             //}
@@ -1571,7 +1576,7 @@ namespace PreGeppou.Data
         }
 
         public static void FileCopy(string filePath1, string filePath2) {
-            lock(DataManager.sDataLock) {
+            lock (DataManager.sDataLock) {
                 try {
                     File.Copy(filePath1, filePath2);
                 } catch (Exception e) {
@@ -1580,11 +1585,11 @@ namespace PreGeppou.Data
             }
         }
 
-	    // 電力会社情報読み込み
-	    public static List<DenryokugaisyaData> readDenryokugaisya(SystemData systemData) {
+        // 電力会社情報読み込み
+        public static List<DenryokugaisyaData> readDenryokugaisya(SystemData systemData) {
             List<DenryokugaisyaData> retList = new List<DenryokugaisyaData>();
             try {
-                lock(DataManager.sDataLock) {
+                lock (DataManager.sDataLock) {
                     List<DenryokugaisyaData> denryokugaisyaData = null;
                     string data = null;
                     try {
@@ -1602,1082 +1607,1082 @@ namespace PreGeppou.Data
                         retList.Add(denryokugaisya);
                     }
                     systemData.listDenryokugaisyaData = retList;
-			    }
-		    } catch (Exception e) {
+                }
+            } catch (Exception e) {
                 //Log.e(TAG, "Unable to read to file [readDenryokugaisya]");
             }
             return systemData.listDenryokugaisyaData;
-	    }
+        }
 
-	public static DenryokugaisyaData getDenryokuGaisya(SystemData systemData) {
-        DenryokugaisyaData denryokugaisyaData = null;
-        foreach (DenryokugaisyaData data in systemData.listDenryokugaisyaData) {
-            if (data.textDenryokugaisyaMei
-                    == systemData.listJigyousyo[systemData.positionJigyousyo].textDenryokugaisya) {
-                denryokugaisyaData = data;
-                break;
+        public static DenryokugaisyaData getDenryokuGaisya(SystemData systemData) {
+            DenryokugaisyaData denryokugaisyaData = null;
+            foreach (DenryokugaisyaData data in systemData.listDenryokugaisyaData) {
+                if (data.textDenryokugaisyaMei
+                        == systemData.listJigyousyo[systemData.positionJigyousyo].textDenryokugaisya) {
+                    denryokugaisyaData = data;
+                    break;
+                }
             }
+            if (denryokugaisyaData == null) {
+                denryokugaisyaData = systemData.listDenryokugaisyaData[0];
+            }
+            return denryokugaisyaData;
         }
-        if (denryokugaisyaData == null) {
-            denryokugaisyaData = systemData.listDenryokugaisyaData[0];
-        }
-        return denryokugaisyaData;
-	}
 
-	public static BaseKeiyaku getKeiyakuSyubetu(SystemData systemData, DenryokugaisyaData denryokugaisyaData) {
-        BaseKeiyaku keiyakuSyubetuData = null;
-        foreach (BaseKeiyaku data in denryokugaisyaData.getRyokin(systemData.tenkenData.itemKensinKongetuHiduke.text).getKeiyakusyubetuList()){//   DataManager.getKeiyakuSyubetu.textKeiyakuSyubetuMei listKeiyaku) {
-            if (data.textKeiyakuSyubetuMei == systemData.listJigyousyo[systemData.positionJigyousyo].textKeiyakusyubetu) {
-                keiyakuSyubetuData = data;
-                break;
+        public static BaseKeiyaku getKeiyakuSyubetu(SystemData systemData, DenryokugaisyaData denryokugaisyaData) {
+            BaseKeiyaku keiyakuSyubetuData = null;
+            foreach (BaseKeiyaku data in denryokugaisyaData.getRyokin(systemData.tenkenData.itemKensinKongetuHiduke.text).getKeiyakusyubetuList()) {//   DataManager.getKeiyakuSyubetu.textKeiyakuSyubetuMei listKeiyaku) {
+                if (data.textKeiyakuSyubetuMei == systemData.listJigyousyo[systemData.positionJigyousyo].textKeiyakusyubetu) {
+                    keiyakuSyubetuData = data;
+                    break;
+                }
             }
-        }
-        if (keiyakuSyubetuData == null) {
+            if (keiyakuSyubetuData == null) {
                 keiyakuSyubetuData = denryokugaisyaData.getRyokin(systemData.tenkenData.itemKensinKongetuHiduke.text).getKeiyakusyubetuList()[0];
+            }
+            return keiyakuSyubetuData;
         }
-        return keiyakuSyubetuData;
-	}
 
-	// 点検記号情報書込み
-	public static void writeDenryokugaisya(List<DenryokugaisyaData> list) {
+        // 点検記号情報書込み
+        public static void writeDenryokugaisya(List<DenryokugaisyaData> list) {
             try {
-                lock(DataManager.sDataLock) {
+                lock (DataManager.sDataLock) {
                     string stringJson;
                     stringJson = JsonSerializer.Serialize(list); //["shika",koala]
-                                                                // ファイル書き込み
+                                                                 // ファイル書き込み
                     saveText(stringJson, FileNameDenryokugaisya);
-			    }
-		    } catch (Exception e) {
+                }
+            } catch (Exception e) {
                 //Log.e(TAG, "Unable to write to file [writeDenryokugaisya]");
             }
-	}
+        }
 
-	public static int getDenryokugaisyaIndex(SystemData dataSystem, string DenryokugaisyaMei) {
+        public static int getDenryokugaisyaIndex(SystemData dataSystem, string DenryokugaisyaMei) {
             int index = 0;
             foreach (DenryokugaisyaData denryokugaisya in dataSystem.listDenryokugaisyaData) {
-            if (denryokugaisya.textDenryokugaisyaMei == DenryokugaisyaMei) {
-                break;
+                if (denryokugaisya.textDenryokugaisyaMei == DenryokugaisyaMei) {
+                    break;
+                }
+                index++;
             }
-            index++;
-        }
-        if (dataSystem.listDenryokugaisyaData.Count == index) {
+            if (dataSystem.listDenryokugaisyaData.Count == index) {
                 index = 0;
             }
             return index;
-	}
-
-	public static int getKeiyakusyubetuIndex(List<BaseKeiyaku> listKeiyaku, JigyousyoData jigyoujyouData) {
-    if (jigyoujyouData == null)
-        return 0;
-    int position = 0;
-    foreach (BaseKeiyaku keiyakusyubetu in listKeiyaku) {
-    if (keiyakusyubetu.textKeiyakuSyubetuMei == jigyoujyouData.textKeiyakusyubetu) {
-        break;
-    }
-    position++;
-}
-if (listKeiyaku.Count == position)
-    position = 0;
-return position;
-	}
-
-	// 電力会社初期値設定
-	public static SystemData getDenryokugaisyaListData(SystemData systemData) {
-    List<DenryokugaisyaData> listDenryokugaisyaDataData = readDenryokugaisya(systemData);
-    if (listDenryokugaisyaDataData == null || listDenryokugaisyaDataData.Count == 0 || listDenryokugaisyaDataData[0].listRyokin == null) {
-        listDenryokugaisyaDataData = new List<DenryokugaisyaData>();
-        listDenryokugaisyaDataData.Add(new DenryokugaisyaData("北海道電力", KeiyakuSyubetuDataMake.makeHokkaidoDenryoku(), null, null, null));
-        listDenryokugaisyaDataData.Add(new DenryokugaisyaData("東北電力", KeiyakuSyubetuDataMake.makeTouhokuDenryoku(), null, null, null));
-        listDenryokugaisyaDataData.Add(new DenryokugaisyaData("東京電力", KeiyakuSyubetuDataMake.makeTokyoDenryoku(), null, null, null));
-        listDenryokugaisyaDataData.Add(new DenryokugaisyaData("中部電力", KeiyakuSyubetuDataMake.makeCyuubuDenryoku(), null, null, null));
-        listDenryokugaisyaDataData.Add(new DenryokugaisyaData("北陸電力", KeiyakuSyubetuDataMake.makeHokurikuDenryoku(), null, null, null));
-        listDenryokugaisyaDataData.Add(new DenryokugaisyaData("関西電力", KeiyakuSyubetuDataMake.makeKansaiDenryoku(), null, null, null));
-        listDenryokugaisyaDataData.Add(new DenryokugaisyaData("中国電力", KeiyakuSyubetuDataMake.makeCyuugokuDenryoku(), null, null, null));
-        listDenryokugaisyaDataData.Add(new DenryokugaisyaData("四国電力", KeiyakuSyubetuDataMake.makeSikokuDenryoku(), null, null, null));
-        listDenryokugaisyaDataData.Add(new DenryokugaisyaData("九州電力", KeiyakuSyubetuDataMake.makeKyuusyuDenryoku(), null, null, null));
-        listDenryokugaisyaDataData.Add(new DenryokugaisyaData("沖縄電力", KeiyakuSyubetuDataMake.makeOkinawaDenryoku(), null, null, null));
-    }
-
-    if (listDenryokugaisyaDataData[0].listRyokin == null || listDenryokugaisyaDataData[0].listRyokin.Count == 0) {
-        if (listDenryokugaisyaDataData[0].textDenryokugaisyaMei == "北海道電力") {
-            listDenryokugaisyaDataData[0].setRyokin(KeiyakuSyubetuDataMake.makeHokkaidoDenryoku());
-        } else if (listDenryokugaisyaDataData[0].textDenryokugaisyaMei == "東北電力") {
-            listDenryokugaisyaDataData[0].setRyokin(KeiyakuSyubetuDataMake.makeTouhokuDenryoku());
-        } else if (listDenryokugaisyaDataData[0].textDenryokugaisyaMei == "東京電力") {
-            listDenryokugaisyaDataData[0].setRyokin(KeiyakuSyubetuDataMake.makeTokyoDenryoku());
-        } else if (listDenryokugaisyaDataData[0].textDenryokugaisyaMei == "中部電力") {
-            listDenryokugaisyaDataData[0].setRyokin(KeiyakuSyubetuDataMake.makeCyuubuDenryoku());
-        } else if (listDenryokugaisyaDataData[0].textDenryokugaisyaMei == "北陸電力") {
-            listDenryokugaisyaDataData[0].setRyokin(KeiyakuSyubetuDataMake.makeHokurikuDenryoku());
-        } else if (listDenryokugaisyaDataData[0].textDenryokugaisyaMei == "関西電力") {
-            listDenryokugaisyaDataData[0].setRyokin(KeiyakuSyubetuDataMake.makeKansaiDenryoku());
-        } else if (listDenryokugaisyaDataData[0].textDenryokugaisyaMei == "中国電力") {
-            listDenryokugaisyaDataData[0].setRyokin(KeiyakuSyubetuDataMake.makeCyuugokuDenryoku());
-        } else if (listDenryokugaisyaDataData[0].textDenryokugaisyaMei == "四国電力") {
-            listDenryokugaisyaDataData[0].setRyokin(KeiyakuSyubetuDataMake.makeSikokuDenryoku());
-        } else if (listDenryokugaisyaDataData[0].textDenryokugaisyaMei == "九州電力") {
-            listDenryokugaisyaDataData[0].setRyokin(KeiyakuSyubetuDataMake.makeKyuusyuDenryoku());
-        } else if (listDenryokugaisyaDataData[0].textDenryokugaisyaMei == "沖縄電力") {
-            listDenryokugaisyaDataData[0].setRyokin(KeiyakuSyubetuDataMake.makeOkinawaDenryoku());
         }
-    }
-    systemData.listDenryokugaisyaData = listDenryokugaisyaDataData;
-    return systemData;
-}
 
-public static bool equals(string item, string target) {
-    if (item == null) {
-        return false;
-    }
-    return item == target;
-}
-
-public static bool equals(Item item, string target) {
-    if (item == null || item.text == null) {
-        return false;
-    }
-    return item.text == target;
-}
-
-public static bool contains(Item item, string target) {
-    if (isEmpty(item)) {
-        return false;
-    }
-    return item.text.Contains(target);
-}
-
-public static bool contains(string item, string target) {
-    if (Common.isEmpty(item)) {
-        return false;
-    }
-    return item.Contains(target);
-}
-
-public static bool isNull(Item item) {
-    if (item == null) {
-        return true;
-    }
-    return false;
-}
-
-public static bool isNull(string item) {
-    if (item == null) {
-        return true;
-    }
-    return false;
-}
-
-public static bool isEmpty(Item item) {
-    if (item == null || item.text == null || item.text == "" || item.text == "0") {
-        if (item == null) {
-            item = new Item();
+        public static int getKeiyakusyubetuIndex(List<BaseKeiyaku> listKeiyaku, JigyousyoData jigyoujyouData) {
+            if (jigyoujyouData == null)
+                return 0;
+            int position = 0;
+            foreach (BaseKeiyaku keiyakusyubetu in listKeiyaku) {
+                if (keiyakusyubetu.textKeiyakuSyubetuMei == jigyoujyouData.textKeiyakusyubetu) {
+                    break;
+                }
+                position++;
+            }
+            if (listKeiyaku.Count == position)
+                position = 0;
+            return position;
         }
-        return true;
-    }
-    return false;
-}
 
-public static bool isZero(Item item) {
-    if (item == null || item.text == "" || item.text == "0") {
-        return false;
-    }
-    try {
-        double iszero = double.Parse(item.text);
-        return (iszero == 0.0);
-    } catch (Exception e) {
-        return false;
-    }
-}
+        // 電力会社初期値設定
+        public static SystemData getDenryokugaisyaListData(SystemData systemData) {
+            List<DenryokugaisyaData> listDenryokugaisyaDataData = readDenryokugaisya(systemData);
+            if (listDenryokugaisyaDataData == null || listDenryokugaisyaDataData.Count == 0 || listDenryokugaisyaDataData[0].listRyokin == null) {
+                listDenryokugaisyaDataData = new List<DenryokugaisyaData>();
+                listDenryokugaisyaDataData.Add(new DenryokugaisyaData("北海道電力", KeiyakuSyubetuDataMake.makeHokkaidoDenryoku(), null, null, null));
+                listDenryokugaisyaDataData.Add(new DenryokugaisyaData("東北電力", KeiyakuSyubetuDataMake.makeTouhokuDenryoku(), null, null, null));
+                listDenryokugaisyaDataData.Add(new DenryokugaisyaData("東京電力", KeiyakuSyubetuDataMake.makeTokyoDenryoku(), null, null, null));
+                listDenryokugaisyaDataData.Add(new DenryokugaisyaData("中部電力", KeiyakuSyubetuDataMake.makeCyuubuDenryoku(), null, null, null));
+                listDenryokugaisyaDataData.Add(new DenryokugaisyaData("北陸電力", KeiyakuSyubetuDataMake.makeHokurikuDenryoku(), null, null, null));
+                listDenryokugaisyaDataData.Add(new DenryokugaisyaData("関西電力", KeiyakuSyubetuDataMake.makeKansaiDenryoku(), null, null, null));
+                listDenryokugaisyaDataData.Add(new DenryokugaisyaData("中国電力", KeiyakuSyubetuDataMake.makeCyuugokuDenryoku(), null, null, null));
+                listDenryokugaisyaDataData.Add(new DenryokugaisyaData("四国電力", KeiyakuSyubetuDataMake.makeSikokuDenryoku(), null, null, null));
+                listDenryokugaisyaDataData.Add(new DenryokugaisyaData("九州電力", KeiyakuSyubetuDataMake.makeKyuusyuDenryoku(), null, null, null));
+                listDenryokugaisyaDataData.Add(new DenryokugaisyaData("沖縄電力", KeiyakuSyubetuDataMake.makeOkinawaDenryoku(), null, null, null));
+            }
 
-public static bool isZero(string item) {
-    if (item == null || item == "") {
-        return false;
-    }
-    try {
-        double iszero = double.Parse(item);
-        return (iszero == 0.0);
-    } catch (Exception e) {
-        return false;
-    }
-}
+            if (listDenryokugaisyaDataData[0].listRyokin == null || listDenryokugaisyaDataData[0].listRyokin.Count == 0) {
+                if (listDenryokugaisyaDataData[0].textDenryokugaisyaMei == "北海道電力") {
+                    listDenryokugaisyaDataData[0].setRyokin(KeiyakuSyubetuDataMake.makeHokkaidoDenryoku());
+                } else if (listDenryokugaisyaDataData[0].textDenryokugaisyaMei == "東北電力") {
+                    listDenryokugaisyaDataData[0].setRyokin(KeiyakuSyubetuDataMake.makeTouhokuDenryoku());
+                } else if (listDenryokugaisyaDataData[0].textDenryokugaisyaMei == "東京電力") {
+                    listDenryokugaisyaDataData[0].setRyokin(KeiyakuSyubetuDataMake.makeTokyoDenryoku());
+                } else if (listDenryokugaisyaDataData[0].textDenryokugaisyaMei == "中部電力") {
+                    listDenryokugaisyaDataData[0].setRyokin(KeiyakuSyubetuDataMake.makeCyuubuDenryoku());
+                } else if (listDenryokugaisyaDataData[0].textDenryokugaisyaMei == "北陸電力") {
+                    listDenryokugaisyaDataData[0].setRyokin(KeiyakuSyubetuDataMake.makeHokurikuDenryoku());
+                } else if (listDenryokugaisyaDataData[0].textDenryokugaisyaMei == "関西電力") {
+                    listDenryokugaisyaDataData[0].setRyokin(KeiyakuSyubetuDataMake.makeKansaiDenryoku());
+                } else if (listDenryokugaisyaDataData[0].textDenryokugaisyaMei == "中国電力") {
+                    listDenryokugaisyaDataData[0].setRyokin(KeiyakuSyubetuDataMake.makeCyuugokuDenryoku());
+                } else if (listDenryokugaisyaDataData[0].textDenryokugaisyaMei == "四国電力") {
+                    listDenryokugaisyaDataData[0].setRyokin(KeiyakuSyubetuDataMake.makeSikokuDenryoku());
+                } else if (listDenryokugaisyaDataData[0].textDenryokugaisyaMei == "九州電力") {
+                    listDenryokugaisyaDataData[0].setRyokin(KeiyakuSyubetuDataMake.makeKyuusyuDenryoku());
+                } else if (listDenryokugaisyaDataData[0].textDenryokugaisyaMei == "沖縄電力") {
+                    listDenryokugaisyaDataData[0].setRyokin(KeiyakuSyubetuDataMake.makeOkinawaDenryoku());
+                }
+            }
+            systemData.listDenryokugaisyaData = listDenryokugaisyaDataData;
+            return systemData;
+        }
 
-public static bool isNumeric(Item item) {
-    if (isEmpty(item)) {
-        return false;
-    }
-    return Common.isNumeric(item.text);
-}
+        public static bool equals(string item, string target) {
+            if (item == null) {
+                return false;
+            }
+            return item == target;
+        }
 
-public static bool isNumeric(string item) {
-    if (Common.isEmpty(item)) {
-        return false;
-    }
-    return Common.isNumeric(item);
-}
+        public static bool equals(Item item, string target) {
+            if (item == null || item.text == null) {
+                return false;
+            }
+            return item.text == target;
+        }
 
-public static SystemData Convert(string data) {
-    string[] arrData = data.Split("\r");
-    SystemData systemData = new SystemData();
-    return systemData;
-}
+        public static bool contains(Item item, string target) {
+            if (isEmpty(item)) {
+                return false;
+            }
+            return item.text.Contains(target);
+        }
 
-public static Framework.PrintItem getHukaritu(Item heikin, Item saidaiDenryoku) {
-    double dHeikin = 0.0;
-    double dSaidaiDenryoku = 0.0;
-    try {
-        dHeikin = double.Parse(heikin.text.Replace(",", ""));
-        dSaidaiDenryoku = double.Parse(saidaiDenryoku.text);
-    } catch (Exception e) {
-        return new Framework.PrintItem("", true);
-    }
-    double fukaritu = dHeikin * 100 / dSaidaiDenryoku;
-    fukaritu = fukaritu / 24.0;
-    string strFukaritu = string.Format("%.1f", fukaritu);
-    return new Framework.PrintItem(strFukaritu, true);
-}
+        public static bool contains(string item, string target) {
+            if (Common.isEmpty(item)) {
+                return false;
+            }
+            return item.Contains(target);
+        }
 
-public static readonly int ROUND_OFF = 0;
-public static readonly int ROUND_UP = 1;
-public static readonly int ROUND_DOWN = 2;
+        public static bool isNull(Item item) {
+            if (item == null) {
+                return true;
+            }
+            return false;
+        }
 
-public static Item round(Item strNum, int mode) {
-    string retstring = "";
-    if (isZero(strNum))
-        return strNum;
-    if (Common.isNumeric(strNum.text) == false)
-        return strNum;
-    if (mode == ROUND_OFF) {
-        retstring = Math.Round(double.Parse(strNum.text)).ToString();
-    } else if (mode == ROUND_UP) {
-        retstring = Math.Ceiling(double.Parse(strNum.text)).ToString();
-    } else if (mode == ROUND_DOWN) {
-        retstring = Math.Floor(double.Parse(strNum.text)).ToString();
-    }
-    strNum.text = retstring;
-    return strNum;
-}
+        public static bool isNull(string item) {
+            if (item == null) {
+                return true;
+            }
+            return false;
+        }
 
-public static string round(string number, int mode) {
-    string retstring = "";
-    if (isZero(number))
-        return number;
-    if (Common.isNumeric(number) == false)
-        return number;
-    if (mode == ROUND_OFF) {
-        retstring = Math.Round(double.Parse(number)).ToString();
-    } else if (mode == ROUND_UP) {
-        retstring = Math.Ceiling(double.Parse(number)).ToString();
-    } else if (mode == ROUND_DOWN) {
-        retstring = Math.Floor(double.Parse(number)).ToString();
-    }
-    number = retstring;
-    return number;
-}
+        public static bool isEmpty(Item item) {
+            if (item == null || item.text == null || item.text == "" || item.text == "0") {
+                if (item == null) {
+                    item = new Item();
+                }
+                return true;
+            }
+            return false;
+        }
 
-public static SystemData setTenkenKigouListData(SystemData systemData) {
-    List<TenkenKigouData> listTenkenKigou = DataManager.readTenkenKigou(systemData);
-    if (listTenkenKigou == null || listTenkenKigou.Count == 0 || listTenkenKigou[0].itemTenkenKigou == null) {
-        listTenkenKigou = new List<TenkenKigouData>();
-        listTenkenKigou.Add(new TenkenKigouData(new Item("レ"), null, null, null));
-        listTenkenKigou.Add(new TenkenKigouData(new Item("○"), null, null, null));
-        listTenkenKigou.Add(new TenkenKigouData(new Item("良"), null, null, null));
-        listTenkenKigou.Add(new TenkenKigouData(new Item("△"), null, null, null));
-        listTenkenKigou.Add(new TenkenKigouData(new Item("×"), null, null, null));
-        listTenkenKigou.Add(new TenkenKigouData(new Item("否"), null, null, null));
-        listTenkenKigou.Add(new TenkenKigouData(new Item("－"), null, null, null));
-        listTenkenKigou.Add(new TenkenKigouData(new Item("①"), null, null, null));
-        listTenkenKigou.Add(new TenkenKigouData(new Item("②"), null, null, null));
-        listTenkenKigou.Add(new TenkenKigouData(new Item("③"), null, null, null));
-        listTenkenKigou.Add(new TenkenKigouData(new Item("④"), null, null, null));
-        listTenkenKigou.Add(new TenkenKigouData(new Item("⑤"), null, null, null));
-        listTenkenKigou.Add(new TenkenKigouData(new Item("⑥"), null, null, null));
-        listTenkenKigou.Add(new TenkenKigouData(new Item("⑦"), null, null, null));
-        listTenkenKigou.Add(new TenkenKigouData(new Item("⑧"), null, null, null));
-        listTenkenKigou.Add(new TenkenKigouData(new Item("⑨"), null, null, null));
-        listTenkenKigou.Add(new TenkenKigouData(new Item("⑩"), null, null, null));
-    }
-    systemData.listTenkenKigou = listTenkenKigou;
-    return systemData;
-}
+        public static bool isZero(Item item) {
+            if (item == null || item.text == "" || item.text == "0") {
+                return false;
+            }
+            try {
+                double iszero = double.Parse(item.text);
+                return (iszero == 0.0);
+            } catch (Exception e) {
+                return false;
+            }
+        }
 
-/**
- * スピナーの内容を設定します。TODO
- */
-public static List<string> setSpinnerItem(SystemData systemData) {
-//    // スピナーボタンに表示するテキスト
-//    ArrayAdapter<string> adapter = new ArrayAdapter<string>(context, R.layout.tenken_tenkou_spinner_layout);
-//    // スピナーを押したときに表示するチェックテキスト
-//    adapter.setDropDownViewResource(R.layout.tenken_tenkou_spinner_dropdown_layout);
-//    for (TenkenKigouData kigou : systemData.listTenkenKigou) {
-//    adapter.add(kigou.itemTenkenKigou.text);
-//}
-return null;
-	}
+        public static bool isZero(string item) {
+            if (item == null || item == "") {
+                return false;
+            }
+            try {
+                double iszero = double.Parse(item);
+                return (iszero == 0.0);
+            } catch (Exception e) {
+                return false;
+            }
+        }
+
+        public static bool isNumeric(Item item) {
+            if (isEmpty(item)) {
+                return false;
+            }
+            return Common.isNumeric(item.text);
+        }
+
+        public static bool isNumeric(string item) {
+            if (Common.isEmpty(item)) {
+                return false;
+            }
+            return Common.isNumeric(item);
+        }
+
+        public static SystemData Convert(string data) {
+            string[] arrData = data.Split("\r");
+            SystemData systemData = new SystemData();
+            return systemData;
+        }
+
+        public static Framework.PrintItem getHukaritu(Item heikin, Item saidaiDenryoku) {
+            double dHeikin = 0.0;
+            double dSaidaiDenryoku = 0.0;
+            try {
+                dHeikin = double.Parse(heikin.text.Replace(",", ""));
+                dSaidaiDenryoku = double.Parse(saidaiDenryoku.text);
+            } catch (Exception e) {
+                return new Framework.PrintItem("", true);
+            }
+            double fukaritu = dHeikin * 100 / dSaidaiDenryoku;
+            fukaritu = fukaritu / 24.0;
+            string strFukaritu = string.Format("%.1f", fukaritu);
+            return new Framework.PrintItem(strFukaritu, true);
+        }
+
+        public static readonly int ROUND_OFF = 0;
+        public static readonly int ROUND_UP = 1;
+        public static readonly int ROUND_DOWN = 2;
+
+        public static Item round(Item strNum, int mode) {
+            string retstring = "";
+            if (isZero(strNum))
+                return strNum;
+            if (Common.isNumeric(strNum.text) == false)
+                return strNum;
+            if (mode == ROUND_OFF) {
+                retstring = Math.Round(double.Parse(strNum.text)).ToString();
+            } else if (mode == ROUND_UP) {
+                retstring = Math.Ceiling(double.Parse(strNum.text)).ToString();
+            } else if (mode == ROUND_DOWN) {
+                retstring = Math.Floor(double.Parse(strNum.text)).ToString();
+            }
+            strNum.text = retstring;
+            return strNum;
+        }
+
+        public static string round(string number, int mode) {
+            string retstring = "";
+            if (isZero(number))
+                return number;
+            if (Common.isNumeric(number) == false)
+                return number;
+            if (mode == ROUND_OFF) {
+                retstring = Math.Round(double.Parse(number)).ToString();
+            } else if (mode == ROUND_UP) {
+                retstring = Math.Ceiling(double.Parse(number)).ToString();
+            } else if (mode == ROUND_DOWN) {
+                retstring = Math.Floor(double.Parse(number)).ToString();
+            }
+            number = retstring;
+            return number;
+        }
+
+        public static SystemData setTenkenKigouListData(SystemData systemData) {
+            List<TenkenKigouData> listTenkenKigou = DataManager.readTenkenKigou(systemData);
+            if (listTenkenKigou == null || listTenkenKigou.Count == 0 || listTenkenKigou[0].itemTenkenKigou == null) {
+                listTenkenKigou = new List<TenkenKigouData>();
+                listTenkenKigou.Add(new TenkenKigouData(new Item("レ"), null, null, null));
+                listTenkenKigou.Add(new TenkenKigouData(new Item("○"), null, null, null));
+                listTenkenKigou.Add(new TenkenKigouData(new Item("良"), null, null, null));
+                listTenkenKigou.Add(new TenkenKigouData(new Item("△"), null, null, null));
+                listTenkenKigou.Add(new TenkenKigouData(new Item("×"), null, null, null));
+                listTenkenKigou.Add(new TenkenKigouData(new Item("否"), null, null, null));
+                listTenkenKigou.Add(new TenkenKigouData(new Item("－"), null, null, null));
+                listTenkenKigou.Add(new TenkenKigouData(new Item("①"), null, null, null));
+                listTenkenKigou.Add(new TenkenKigouData(new Item("②"), null, null, null));
+                listTenkenKigou.Add(new TenkenKigouData(new Item("③"), null, null, null));
+                listTenkenKigou.Add(new TenkenKigouData(new Item("④"), null, null, null));
+                listTenkenKigou.Add(new TenkenKigouData(new Item("⑤"), null, null, null));
+                listTenkenKigou.Add(new TenkenKigouData(new Item("⑥"), null, null, null));
+                listTenkenKigou.Add(new TenkenKigouData(new Item("⑦"), null, null, null));
+                listTenkenKigou.Add(new TenkenKigouData(new Item("⑧"), null, null, null));
+                listTenkenKigou.Add(new TenkenKigouData(new Item("⑨"), null, null, null));
+                listTenkenKigou.Add(new TenkenKigouData(new Item("⑩"), null, null, null));
+            }
+            systemData.listTenkenKigou = listTenkenKigou;
+            return systemData;
+        }
+
+        /**
+         * スピナーの内容を設定します。TODO
+         */
+        public static List<string> setSpinnerItem(SystemData systemData) {
+            //    // スピナーボタンに表示するテキスト
+            //    ArrayAdapter<string> adapter = new ArrayAdapter<string>(context, R.layout.tenken_tenkou_spinner_layout);
+            //    // スピナーを押したときに表示するチェックテキスト
+            //    adapter.setDropDownViewResource(R.layout.tenken_tenkou_spinner_dropdown_layout);
+            //    for (TenkenKigouData kigou : systemData.listTenkenKigou) {
+            //    adapter.add(kigou.itemTenkenKigou.text);
+            //}
+            return null;
+        }
 
         /**
          * スピナーの内容を設定します。TODO
          */
         public static List<string> setSpinnerItem(SystemData systemData, List<string> list) {
-//    // スピナーボタンに表示するテキスト
-//    ArrayAdapter<string> adapter = new ArrayAdapter<string>(context, R.layout.tenken_tenkou_spinner_layout);
-//    // スピナーを押したときに表示するチェックテキスト
-//    adapter.setDropDownViewResource(R.layout.tenken_tenkou_spinner_dropdown_layout);
-//    for (string item : list) {
-//    adapter.add(item);
-//}
-return null;
-	}
+            //    // スピナーボタンに表示するテキスト
+            //    ArrayAdapter<string> adapter = new ArrayAdapter<string>(context, R.layout.tenken_tenkou_spinner_layout);
+            //    // スピナーを押したときに表示するチェックテキスト
+            //    adapter.setDropDownViewResource(R.layout.tenken_tenkou_spinner_dropdown_layout);
+            //    for (string item : list) {
+            //    adapter.add(item);
+            //}
+            return null;
+        }
 
-	public static int getSpinnerIndex(List<TenkenKigouData> listKigou, string textKigou) {
-    if (textKigou == null)
-        return 0;
-    int position = 0;
-    foreach (TenkenKigouData kigou in listKigou) {
-    if (kigou.itemTenkenKigou.text == null) {
-        break;
-    }
-    if (kigou.itemTenkenKigou.text == textKigou) {
-        break;
-    }
-    position++;
-}
-if (listKigou.Count == position)
-    position = 0;
-return position;
-	}
+        public static int getSpinnerIndex(List<TenkenKigouData> listKigou, string textKigou) {
+            if (textKigou == null)
+                return 0;
+            int position = 0;
+            foreach (TenkenKigouData kigou in listKigou) {
+                if (kigou.itemTenkenKigou.text == null) {
+                    break;
+                }
+                if (kigou.itemTenkenKigou.text == textKigou) {
+                    break;
+                }
+                position++;
+            }
+            if (listKigou.Count == position)
+                position = 0;
+            return position;
+        }
 
-	public static int getSpinnerIndex(List<string> listKigou, string textKigou, int dummy) {
+        public static int getSpinnerIndex(List<string> listKigou, string textKigou, int dummy) {
             if (textKigou == null)
                 return 0;
             int position = 0;
             foreach (string kigou in listKigou) {
-            if (kigou == null) {
-                break;
+                if (kigou == null) {
+                    break;
+                }
+                if (kigou == textKigou) {
+                    break;
+                }
+                position++;
             }
-            if (kigou == textKigou) {
-                break;
-            }
-            position++;
+            if (listKigou.Count == position)
+                position = 0;
+            return position;
         }
-        if (listKigou.Count == position)
-            position = 0;
-        return position;
-	}
 
-	private static Dictionary<string, Item> setRelation(string[] arrData, SystemData systemData) {
+        private static Dictionary<string, Item> setRelation(string[] arrData, SystemData systemData) {
             Dictionary<string, Item> map = new Dictionary<string, Item>();
-        map.Add("TK", systemData.tenkenData.itemTenkenNijtijiYMD);
-        map.Add("TJ", systemData.tenkenData.itemJyouritu);
-        map.Add("TKTE", systemData.tenkenData.itemKeiyakuDenryoku);
-        map.Add("TJARS", systemData.tenkenData.itemDenatuRS);
-        map.Add("TJAST", systemData.tenkenData.itemDenatuST);
-        map.Add("TJATR", systemData.tenkenData.itemDenatuTR);
-        map.Add("TJRR", systemData.tenkenData.itemDenryuR);
-        map.Add("TJRS", systemData.tenkenData.itemDenryuS);
-        map.Add("TJRT", systemData.tenkenData.itemDenryuT);
-        map.Add("TJD", systemData.tenkenData.itemDenryoku);
-        map.Add("TJR", systemData.tenkenData.itemRikiritu);
-        map.Add("TKK1", systemData.tenkenData.itemKensinKongetu1);
-        map.Add("TKK2", systemData.tenkenData.itemKensinKongetu2);
-        map.Add("TKK3", systemData.tenkenData.itemKensinKongetu3);
-        map.Add("TKK4", systemData.tenkenData.itemKensinKongetu4);
-        map.Add("TKZ1", systemData.tenkenData.itemKensinSengetu1);
-        map.Add("TKZ2", systemData.tenkenData.itemKensinSengetu2);
-        map.Add("TKZ3", systemData.tenkenData.itemKensinSengetu3);
-        map.Add("TKZ4", systemData.tenkenData.itemKensinSengetu4);
-        map.Add("TKHMK", systemData.tenkenData.itemKensinKongetuMukoDenryoku);
-        map.Add("TKHMZ", systemData.tenkenData.itemKensinSengetuMukoDenryoku);
-        map.Add("TKKT1", systemData.tenkenData.itemGenzaiKongetu1);
-        map.Add("TKKT2", systemData.tenkenData.itemGenzaiKongetu2);
-        map.Add("TKKT3", systemData.tenkenData.itemGenzaiKongetu3);
-        map.Add("TKKT4", systemData.tenkenData.itemGenzaiKongetu4);
-        map.Add("TKZT1", systemData.tenkenData.itemGenzaiSengetu1);
-        map.Add("TKZT2", systemData.tenkenData.itemGenzaiSengetu2);
-        map.Add("TKZT3", systemData.tenkenData.itemGenzaiSengetu3);
-        map.Add("TKZT4", systemData.tenkenData.itemGenzaiSengetu4);
-        map.Add("TKHM", systemData.tenkenData.itemGenzaiKongetuMukoDenryoku);
-        map.Add("TKZHM", systemData.tenkenData.itemGenzaiSengetuMukoDenryoku);
-        map.Add("TKD", systemData.tenkenData.itemKensinDenryokuryou);
-        map.Add("TKR", systemData.tenkenData.itemKensinKongetuRikiritu);
-        map.Add("TM1", systemData.tenkenData.itemKensinKoukanMae1);
-        map.Add("TM2", systemData.tenkenData.itemKensinKoukanMae2);
-        map.Add("TM3", systemData.tenkenData.itemKensinKoukanMae3);
-        map.Add("TM4", systemData.tenkenData.itemKensinKoukanMae4);
-        map.Add("TA1", systemData.tenkenData.itemKensinKoukanAto1);
-        map.Add("TA2", systemData.tenkenData.itemKensinKoukanAto2);
-        map.Add("TA3", systemData.tenkenData.itemKensinKoukanAto3);
-        map.Add("TA4", systemData.tenkenData.itemKensinKoukanAto4);
-        map.Add("TMT1", systemData.tenkenData.itemGenzaiKoukanMae1);
-        map.Add("TMT2", systemData.tenkenData.itemGenzaiKoukanMae2);
-        map.Add("TMT3", systemData.tenkenData.itemGenzaiKoukanMae3);
-        map.Add("TMT4", systemData.tenkenData.itemGenzaiKoukanMae4);
-        map.Add("TAT1", systemData.tenkenData.itemGenzaiKoukanAto1);
-        map.Add("TAT2", systemData.tenkenData.itemGenzaiKoukanAto2);
-        map.Add("TAT3", systemData.tenkenData.itemGenzaiKoukanAto3);
-        map.Add("TAT4", systemData.tenkenData.itemGenzaiKoukanAto4);
-        //
-        //    	map.put("TT01", systemData.tenkenData.);
-        //    	map.put("", systemData.tenkenData.);
-        //    	map.put("", systemData.tenkenData.);
-        //    	map.put("", systemData.tenkenData.);
-        //    	map.put("", systemData.tenkenData.);
-        //    	map.put("", systemData.tenkenData.);
-        //    	map.put("", systemData.tenkenData.);
-        //    	map.put("", systemData.tenkenData.);
-        //    	map.put("", systemData.tenkenData.);
-        //    	map.put("", systemData.tenkenData.);
-        //    	map.put("", systemData.tenkenData.);
-        //    	map.put("", systemData.tenkenData.);
-        //    	map.put("", systemData.tenkenData.);
-        //    	map.put("", systemData.tenkenData.);
-        //    	map.put("", systemData.tenkenData.);
-        //    	map.put("", systemData.tenkenData.);
-        //    	map.put("", systemData.tenkenData.);
-        //    	map.put("", systemData.tenkenData.);
-        //    	map.put("", systemData.tenkenData.);
-        //    	map.put("", systemData.tenkenData.);
-        //    	map.put("", systemData.tenkenData.);
-        //    	map.put("", systemData.tenkenData.);
-        //    	map.put("", systemData.tenkenData.);
-        //    	map.put("", systemData.tenkenData.);
-        //    	map.put("", systemData.tenkenData.);
-        //    	map.put("", systemData.tenkenData.);
-        //    	map.put("", systemData.tenkenData.);
-        //    	map.put("", systemData.tenkenData.);
-        //    	map.put("", systemData.tenkenData.);
-        return map;
-    }
-
-public static void setInsatuCyouhyouList(List<string> listInsatuCyouhyou) {
-    listInsatuCyouhyou.Add("印刷帳票1"); // 関東仕様
-    listInsatuCyouhyou.Add("印刷帳票1-季時別"); // 関東仕様
-    listInsatuCyouhyou.Add("印刷帳票1-グラフ付"); // 関東仕様
-    listInsatuCyouhyou.Add("印刷帳票1-変圧器12台"); // 関東仕様
-    listInsatuCyouhyou.Add("印刷帳票2"); // 中部仕様
-    listInsatuCyouhyou.Add("印刷帳票3"); // 関西仕様
-    listInsatuCyouhyou.Add("印刷帳票3-グラフ付"); // 関西仕様
-    listInsatuCyouhyou.Add("印刷帳票3-グラフ付2"); // 関西仕様
-    listInsatuCyouhyou.Add("印刷帳票3-変圧器12台"); // 関西仕様
-    listInsatuCyouhyou.Add("印刷帳票3-変圧器12台-社章なし"); // 関西仕様
-    listInsatuCyouhyou.Add("印刷帳票3-関電管"); // 関西電気管理センター
-    listInsatuCyouhyou.Add("印刷帳票3-関電管12"); // 関西電気管理センター
-    listInsatuCyouhyou.Add("印刷帳票4"); // 中国仕様
-    listInsatuCyouhyou.Add("印刷帳票5"); // 九州仕様
-    listInsatuCyouhyou.Add("印刷帳票5-グラフ付"); // 九州仕様
-}
-
-// 常用発電機
-public static void setJHatudenkiList(List<string> listInsatuCyouhyou) {
-    listInsatuCyouhyou.Add("常用1 印刷帳票");
-    listInsatuCyouhyou.Add("常用2 印刷帳票");
-}
-
-// 非常用発電機
-public static void setHJHatudenkiList(List<string> listInsatuCyouhyou) {
-    listInsatuCyouhyou.Add("非常用1 印刷帳票");
-    listInsatuCyouhyou.Add("非常用2 印刷帳票");
-}
-
-public static string setKensinbiText(SystemData systemData) {
-    if (isEmpty(systemData.tenkenData.itemKensinbi) == true) {
-        return Common.makeKensinDate(systemData.tenkenData.itemTenkenNijtijiYMD.text, "1");
-    }
-    if (isEmpty(systemData.tenkenData.itemTenkenNijtijiYMD) == true) {
-        return Common.makeKensinDate(systemData.tenkenData.itemTenkenNijtijiYMD.text, "1");
-    }
-    string month = Common.getMonth(systemData.tenkenData.itemTenkenNijtijiYMD.text);
-    string date = systemData.tenkenData.itemKensinbi.text;
-    if (month == "4" || month == "6" || month == "9" || month == "11") {
-        if (date == "31") {
-            return Common.getLastDay(systemData.tenkenData.itemTenkenNijtijiYMD.text);
+            map.Add("TK", systemData.tenkenData.itemTenkenNijtijiYMD);
+            map.Add("TJ", systemData.tenkenData.itemJyouritu);
+            map.Add("TKTE", systemData.tenkenData.itemKeiyakuDenryoku);
+            map.Add("TJARS", systemData.tenkenData.itemDenatuRS);
+            map.Add("TJAST", systemData.tenkenData.itemDenatuST);
+            map.Add("TJATR", systemData.tenkenData.itemDenatuTR);
+            map.Add("TJRR", systemData.tenkenData.itemDenryuR);
+            map.Add("TJRS", systemData.tenkenData.itemDenryuS);
+            map.Add("TJRT", systemData.tenkenData.itemDenryuT);
+            map.Add("TJD", systemData.tenkenData.itemDenryoku);
+            map.Add("TJR", systemData.tenkenData.itemRikiritu);
+            map.Add("TKK1", systemData.tenkenData.itemKensinKongetu1);
+            map.Add("TKK2", systemData.tenkenData.itemKensinKongetu2);
+            map.Add("TKK3", systemData.tenkenData.itemKensinKongetu3);
+            map.Add("TKK4", systemData.tenkenData.itemKensinKongetu4);
+            map.Add("TKZ1", systemData.tenkenData.itemKensinSengetu1);
+            map.Add("TKZ2", systemData.tenkenData.itemKensinSengetu2);
+            map.Add("TKZ3", systemData.tenkenData.itemKensinSengetu3);
+            map.Add("TKZ4", systemData.tenkenData.itemKensinSengetu4);
+            map.Add("TKHMK", systemData.tenkenData.itemKensinKongetuMukoDenryoku);
+            map.Add("TKHMZ", systemData.tenkenData.itemKensinSengetuMukoDenryoku);
+            map.Add("TKKT1", systemData.tenkenData.itemGenzaiKongetu1);
+            map.Add("TKKT2", systemData.tenkenData.itemGenzaiKongetu2);
+            map.Add("TKKT3", systemData.tenkenData.itemGenzaiKongetu3);
+            map.Add("TKKT4", systemData.tenkenData.itemGenzaiKongetu4);
+            map.Add("TKZT1", systemData.tenkenData.itemGenzaiSengetu1);
+            map.Add("TKZT2", systemData.tenkenData.itemGenzaiSengetu2);
+            map.Add("TKZT3", systemData.tenkenData.itemGenzaiSengetu3);
+            map.Add("TKZT4", systemData.tenkenData.itemGenzaiSengetu4);
+            map.Add("TKHM", systemData.tenkenData.itemGenzaiKongetuMukoDenryoku);
+            map.Add("TKZHM", systemData.tenkenData.itemGenzaiSengetuMukoDenryoku);
+            map.Add("TKD", systemData.tenkenData.itemKensinDenryokuryou);
+            map.Add("TKR", systemData.tenkenData.itemKensinKongetuRikiritu);
+            map.Add("TM1", systemData.tenkenData.itemKensinKoukanMae1);
+            map.Add("TM2", systemData.tenkenData.itemKensinKoukanMae2);
+            map.Add("TM3", systemData.tenkenData.itemKensinKoukanMae3);
+            map.Add("TM4", systemData.tenkenData.itemKensinKoukanMae4);
+            map.Add("TA1", systemData.tenkenData.itemKensinKoukanAto1);
+            map.Add("TA2", systemData.tenkenData.itemKensinKoukanAto2);
+            map.Add("TA3", systemData.tenkenData.itemKensinKoukanAto3);
+            map.Add("TA4", systemData.tenkenData.itemKensinKoukanAto4);
+            map.Add("TMT1", systemData.tenkenData.itemGenzaiKoukanMae1);
+            map.Add("TMT2", systemData.tenkenData.itemGenzaiKoukanMae2);
+            map.Add("TMT3", systemData.tenkenData.itemGenzaiKoukanMae3);
+            map.Add("TMT4", systemData.tenkenData.itemGenzaiKoukanMae4);
+            map.Add("TAT1", systemData.tenkenData.itemGenzaiKoukanAto1);
+            map.Add("TAT2", systemData.tenkenData.itemGenzaiKoukanAto2);
+            map.Add("TAT3", systemData.tenkenData.itemGenzaiKoukanAto3);
+            map.Add("TAT4", systemData.tenkenData.itemGenzaiKoukanAto4);
+            //
+            //    	map.put("TT01", systemData.tenkenData.);
+            //    	map.put("", systemData.tenkenData.);
+            //    	map.put("", systemData.tenkenData.);
+            //    	map.put("", systemData.tenkenData.);
+            //    	map.put("", systemData.tenkenData.);
+            //    	map.put("", systemData.tenkenData.);
+            //    	map.put("", systemData.tenkenData.);
+            //    	map.put("", systemData.tenkenData.);
+            //    	map.put("", systemData.tenkenData.);
+            //    	map.put("", systemData.tenkenData.);
+            //    	map.put("", systemData.tenkenData.);
+            //    	map.put("", systemData.tenkenData.);
+            //    	map.put("", systemData.tenkenData.);
+            //    	map.put("", systemData.tenkenData.);
+            //    	map.put("", systemData.tenkenData.);
+            //    	map.put("", systemData.tenkenData.);
+            //    	map.put("", systemData.tenkenData.);
+            //    	map.put("", systemData.tenkenData.);
+            //    	map.put("", systemData.tenkenData.);
+            //    	map.put("", systemData.tenkenData.);
+            //    	map.put("", systemData.tenkenData.);
+            //    	map.put("", systemData.tenkenData.);
+            //    	map.put("", systemData.tenkenData.);
+            //    	map.put("", systemData.tenkenData.);
+            //    	map.put("", systemData.tenkenData.);
+            //    	map.put("", systemData.tenkenData.);
+            //    	map.put("", systemData.tenkenData.);
+            //    	map.put("", systemData.tenkenData.);
+            //    	map.put("", systemData.tenkenData.);
+            return map;
         }
-    } else if (month == "2" == true) {
-        if (0 < date.CompareTo("29")) {
-            return Common.getLastDay(systemData.tenkenData.itemTenkenNijtijiYMD.text);
-        }
-    }
-    return Common.makeKensinDate(systemData.tenkenData.itemTenkenNijtijiYMD.text, date);
-}
 
-public static void setupOldVersionData() {
-    string dir = Common.getSystemPath() + "/geppou_convert";
-    string convertDirectory = "jp.increase.geppou";
-
-    if (File.Exists(dir)) {
-        string[] fileList = Directory.GetFiles(dir);
-        foreach (string file in fileList) {
-    try {
-        if (file == "Jigyoujyou.json") {
-            File.Copy(file,"/data/data/" + convertDirectory + "/files/" + Path.GetFileName(file));
+        public static void setInsatuCyouhyouList(List<string> listInsatuCyouhyou) {
+            listInsatuCyouhyou.Add("印刷帳票1"); // 関東仕様
+            listInsatuCyouhyou.Add("印刷帳票1-季時別"); // 関東仕様
+            listInsatuCyouhyou.Add("印刷帳票1-グラフ付"); // 関東仕様
+            listInsatuCyouhyou.Add("印刷帳票1-変圧器12台"); // 関東仕様
+            listInsatuCyouhyou.Add("印刷帳票2"); // 中部仕様
+            listInsatuCyouhyou.Add("印刷帳票3"); // 関西仕様
+            listInsatuCyouhyou.Add("印刷帳票3-グラフ付"); // 関西仕様
+            listInsatuCyouhyou.Add("印刷帳票3-グラフ付2"); // 関西仕様
+            listInsatuCyouhyou.Add("印刷帳票3-変圧器12台"); // 関西仕様
+            listInsatuCyouhyou.Add("印刷帳票3-変圧器12台-社章なし"); // 関西仕様
+            listInsatuCyouhyou.Add("印刷帳票3-関電管"); // 関西電気管理センター
+            listInsatuCyouhyou.Add("印刷帳票3-関電管12"); // 関西電気管理センター
+            listInsatuCyouhyou.Add("印刷帳票4"); // 中国仕様
+            listInsatuCyouhyou.Add("印刷帳票5"); // 九州仕様
+            listInsatuCyouhyou.Add("印刷帳票5-グラフ付"); // 九州仕様
         }
-        File.Copy(file, "/data/data/" + convertDirectory + "/files/" + Path.GetFileName(file));
-    } catch (IOException e) {
-        //e.printStackTrace();
-    }
-}
-		}
-		try {
-            File.Delete(dir);
-        } catch (IOException e) {
-            //e.printStackTrace();
-        }
-	}
 
-	public static void downloadServerData(SystemData systemdata) {
-        // FTPサーバー上に過去の点検データがある場合は、それを取得する
-        if (FTPCommon.isRestoreInitial(null)) {
+        // 常用発電機
+        public static void setJHatudenkiList(List<string> listInsatuCyouhyou) {
+            listInsatuCyouhyou.Add("常用1 印刷帳票");
+            listInsatuCyouhyou.Add("常用2 印刷帳票");
+        }
+
+        // 非常用発電機
+        public static void setHJHatudenkiList(List<string> listInsatuCyouhyou) {
+            listInsatuCyouhyou.Add("非常用1 印刷帳票");
+            listInsatuCyouhyou.Add("非常用2 印刷帳票");
+        }
+
+        public static string setKensinbiText(SystemData systemData) {
+            if (isEmpty(systemData.tenkenData.itemKensinbi) == true) {
+                return Common.makeKensinDate(systemData.tenkenData.itemTenkenNijtijiYMD.text, "1");
+            }
+            if (isEmpty(systemData.tenkenData.itemTenkenNijtijiYMD) == true) {
+                return Common.makeKensinDate(systemData.tenkenData.itemTenkenNijtijiYMD.text, "1");
+            }
+            string month = Common.getMonth(systemData.tenkenData.itemTenkenNijtijiYMD.text);
+            string date = systemData.tenkenData.itemKensinbi.text;
+            if (month == "4" || month == "6" || month == "9" || month == "11") {
+                if (date == "31") {
+                    return Common.getLastDay(systemData.tenkenData.itemTenkenNijtijiYMD.text);
+                }
+            } else if (month == "2" == true) {
+                if (0 < date.CompareTo("29")) {
+                    return Common.getLastDay(systemData.tenkenData.itemTenkenNijtijiYMD.text);
+                }
+            }
+            return Common.makeKensinDate(systemData.tenkenData.itemTenkenNijtijiYMD.text, date);
+        }
+
+        public static void setupOldVersionData() {
+            string dir = Common.getSystemPath() + "/geppou_convert";
+            string convertDirectory = "jp.increase.geppou";
+
+            if (File.Exists(dir)) {
+                string[] fileList = Directory.GetFiles(dir);
+                foreach (string file in fileList) {
+                    try {
+                        if (file == "Jigyoujyou.json") {
+                            File.Copy(file, "/data/data/" + convertDirectory + "/files/" + Path.GetFileName(file));
+                        }
+                        File.Copy(file, "/data/data/" + convertDirectory + "/files/" + Path.GetFileName(file));
+                    } catch (IOException e) {
+                        //e.printStackTrace();
+                    }
+                }
+            }
+            try {
+                File.Delete(dir);
+            } catch (IOException e) {
+                //e.printStackTrace();
+            }
+        }
+
+        public static void downloadServerData(SystemData systemdata) {
+            // FTPサーバー上に過去の点検データがある場合は、それを取得する
+            if (FTPCommon.isRestoreInitial(null)) {
+                //new DataReceive(context, systemdata, true, new FTPDataRcvResultProc()).execute("ftp.increase.main.jp", "21", "main.jp-increase", "sqG14Uwv",
+                //        Common.getPrimaryAccount(context), "initial");
+            }
+        }
+
+        public static void downloadServerData2(SystemData systemdata) {
+            // FTPサーバー上に過去の点検データがある場合は、それを取得する
+            //DataReceive.wait = true;
             //new DataReceive(context, systemdata, true, new FTPDataRcvResultProc()).execute("ftp.increase.main.jp", "21", "main.jp-increase", "sqG14Uwv",
             //        Common.getPrimaryAccount(context), "initial");
         }
-    }
 
-    public static void downloadServerData2(SystemData systemdata) {
-        // FTPサーバー上に過去の点検データがある場合は、それを取得する
-        //DataReceive.wait = true;
-        //new DataReceive(context, systemdata, true, new FTPDataRcvResultProc()).execute("ftp.increase.main.jp", "21", "main.jp-increase", "sqG14Uwv",
-        //        Common.getPrimaryAccount(context), "initial");
-    }
+        public static void downloadServerInformation(SystemData systemdata) {
+            // FTPサーバー上に過去の点検データがある場合は、それを取得する
+            //new DataReceive(context, systemdata, false, new FTPInformationRcvResultProc()).execute("ftp.increase.main.jp", "21", "main.jp-increase", "sqG14Uwv",
+            //        "_Information", "dont initial");
+        }
 
-    public static void downloadServerInformation(SystemData systemdata) {
-        // FTPサーバー上に過去の点検データがある場合は、それを取得する
-        //new DataReceive(context, systemdata, false, new FTPInformationRcvResultProc()).execute("ftp.increase.main.jp", "21", "main.jp-increase", "sqG14Uwv",
-        //        "_Information", "dont initial");
-    }
+        public static void downloadServerRyokin(SystemData systemdata) {
+            //new DataReceive(context, systemdata, false, new FTPInformationRcvResultProc()).execute("ftp.increase.main.jp", "21", "main.jp-increase", "sqG14Uwv",
+            //        "_Ryokin", "dont initial");
+        }
 
-    public static void downloadServerRyokin(SystemData systemdata) {
-        //new DataReceive(context, systemdata, false, new FTPInformationRcvResultProc()).execute("ftp.increase.main.jp", "21", "main.jp-increase", "sqG14Uwv",
-        //        "_Ryokin", "dont initial");
-    }
+        public static void uploadServerData(SystemData systemdata) {
+            //new DataSend(context).execute("ftp.increase.main.jp", "21", Common.getPrimaryAccount(context), "main.jp-increase", "sqG14Uwv", stringUtils.join(context.fileList(), ","), "true");
+        }
 
-    public static void uploadServerData(SystemData systemdata) {
-        //new DataSend(context).execute("ftp.increase.main.jp", "21", Common.getPrimaryAccount(context), "main.jp-increase", "sqG14Uwv", stringUtils.join(context.fileList(), ","), "true");
-    }
+        public static bool isShownDialog = false;
+        public static void showInformationDialog() {
+            string loadText;
+            string[] text;
 
-    public static bool isShownDialog = false;
-    public static void showInformationDialog() {
-        string loadText;
-        string[] text;
+            if (isShownDialog == true)
+                return; // 月報くんを起動してから一度はダイアログを表示した場合は表示しない
+            isShownDialog = true;
 
-        if (isShownDialog == true)
-            return; // 月報くんを起動してから一度はダイアログを表示した場合は表示しない
-        isShownDialog = true;
-
-        try {
-            loadText = DataManager.loadText("information.txt");
-            text = loadText.Split("\r\n");
-            for (int i = 0; i < text.Length; i++) {
-                i = Information.setInformation(text, i);
+            try {
+                loadText = DataManager.loadText("information.txt");
+                text = loadText.Split("\r\n");
+                for (int i = 0; i < text.Length; i++) {
+                    i = Information.setInformation(text, i);
+                }
+            } catch (IOException e) {
+                //e.printStackTrace();
             }
-        } catch (IOException e) {
-            //e.printStackTrace();
-        }
 
-        if (InformationActivity.informations != null && InformationActivity.informations[0].text != null) {
-            string message = "";
-            foreach (Information informations in InformationActivity.informations){
-            message += informations.getInformation() + "\r\n\r\n";
-        }
-        message = message.Substring(0, message.Length - 4);
-            // メッセージをダイアログに常時する
+            if (InformationActivity.informations != null && InformationActivity.informations[0].text != null) {
+                string message = "";
+                foreach (Information informations in InformationActivity.informations) {
+                    message += informations.getInformation() + "\r\n\r\n";
+                }
+                message = message.Substring(0, message.Length - 4);
+                // メッセージをダイアログに常時する
                 //activity.setInformationDialog(activity, message);
-		}
-	}
-
-	public static int getNenjiTenkenInfo(JigyousyoData jigyousyoData) {
-    string ym = makeYMD();
-    if (ym.Length != 11)
-        return 0;
-    string momth = ym.Substring(5, 7);
-    if (Common.isNumeric(momth) == false)
-        return 0;
-    int m = int.Parse(momth);
-    if (jigyousyoData.nentenken[m - 1] == true) {
-        return 1;
-    }
-    if (m == 12)
-        m = 1;
-    else
-        m++;
-    if (jigyousyoData.nentenken[m - 1] == true) {
-        return 2;
-    }
-
-    return 0;
-}
-
-public static int getGetujiTenkenInfo(JigyousyoData jigyousyoData, string ym) {
-    if (ym.Length != 11)
-        return 0;
-    string momth = ym.Substring(5, 7);
-    if (Common.isNumeric(momth) == false) {
-        return 0;
-    }
-    int m = int.Parse(momth);
-    if (jigyousyoData.tukitenken[m - 1] == true) {
-        return 1;
-    }
-
-    return 0;
-}
-
-public static int getGetujiTenkenInfo(JigyousyoData jigyousyoData) {
-    string ym = makeYMD();
-    if (ym.Length != 11)
-        return 0;
-    string momth = ym.Substring(5, 7);
-    if (Common.isNumeric(momth) == false)
-        return 0;
-    int m = int.Parse(momth);
-    if (jigyousyoData.tukitenken[m - 1] == true) {
-        return 1;
-    }
-
-    return 0;
-}
-
-// 月額使用電力量/契約電力を計算する
-public static string getSiyoudenryokuDivKeiyakuDenryoku(Item Heikin, Item Keiyaku) {
-    string ret = "";
-
-    ret = Common.getMultiply(Common.getDivide(Heikin.text, Keiyaku.text, 2), "30", 2);
-
-
-    //		Item genzaiNissuu = new Item(Common.getNissu(systemData.tenkenData.itemGenzaiKongetuHiduke.text, systemData.tenkenData.itemGenzaiSengetuHiduke.text),
-    //			 	 systemData.tenkenData.itemGenzaiKongetuHiduke.color, systemData.tenkenData.itemGenzaiKongetuHiduke.bgcolor);
-    //		Item kensinNissuu = new Item(Common.getNissu(systemData.tenkenData.itemKensinKongetuHiduke.text, systemData.tenkenData.itemKensinSengetuHiduke.text),
-    //				 systemData.tenkenData.itemKensinSengetuHiduke.color, systemData.tenkenData.itemKensinSengetuHiduke.bgcolor);
-    //
-    //		if(DataManager.equals(systemData.tenkenData.itemCheckboxYusen, "1")){
-    //			ret = Common.divide(getText(systemData.tenkenData.itemGenzaiDenryokuryou),
-    //								Common.multiply(genzaiNissuu.text, getText(systemData.tenkenData.itemKeiyakuDenryoku)));
-    //		}else{
-    //			ret = Common.divide(getText(systemData.tenkenData.itemKensinDenryokuryou),
-    //								Common.multiply(kensinNissuu.text, getText(systemData.tenkenData.itemKeiyakuDenryoku)));
-    //		}
-
-    return ret;
-}
-
-// SDカードに点検データを書き出す
-//public static void writeToSDCard() {
-//    try {
-//        if (Common.getMountSDCard() != null) {
-//            //ファイルの一覧を検索するディレクトリパスを指定する
-//            string path = Common.getSystemPath();
-//            string[] files = Directory.GetFiles(path, "*");
-//                    Array.Sort(files);
-
-//            if (Directory.Exists(Common.getMountSDCard() + "/geppou/data")) {
-//                //System.out.println("ファイルは存在します");
-//            } else {
-//                //System.out.println("ファイルは存在しません");
-//                Directory.CreateDirectory(Common.getMountSDCard() + "/geppou/data");
-//            }
-
-//            foreach (var file in files) {
-//                FileCopy(file, pathSDCard + "/" + file.getName());
-//}
-//			}
-//		} catch (Exception e) {
-//    Log.e(TAG, "Unable to write to file");
-//    return; // ファイルが見つからない場合
-//}
-//	}
-
-	public static void setHyuosiJigyoujyouName(SystemData systemData) {
-        if (isEmpty(systemData.tenkenData.hyousiData.itemAtena)) {
-            systemData.tenkenData.hyousiData.itemAtena = new Item("");
+            }
         }
-        if (isEmpty(systemData.tenkenData.hyousiData.itemJigyoujyoumei)) {
-            systemData.tenkenData.hyousiData.itemJigyoujyoumei = new Item("");
-        }
-        if (systemData.tenkenData.hyousiData.itemAtena.text == "") {
-            systemData.tenkenData.hyousiData.itemAtena.text = systemData.jigyousyoData.textTitle + " " + systemData.jigyousyoData.textSubTitle;
-        }
-        if (systemData.tenkenData.hyousiData.itemJigyoujyoumei.text == "") {
-            systemData.tenkenData.hyousiData.itemJigyoujyoumei.text = systemData.jigyousyoData.textTitle + " " + systemData.jigyousyoData.textSubTitle;
-        }
-    }
 
-public static void setKensinYMD(SystemData systemData) {
-    //フォーマットパターンを指定して表示する
+        public static int getNenjiTenkenInfo(JigyousyoData jigyousyoData) {
+            string ym = makeYMD();
+            if (ym.Length != 11)
+                return 0;
+            string momth = ym.Substring(5, 7);
+            if (Common.isNumeric(momth) == false)
+                return 0;
+            int m = int.Parse(momth);
+            if (jigyousyoData.nentenken[m - 1] == true) {
+                return 1;
+            }
+            if (m == 12)
+                m = 1;
+            else
+                m++;
+            if (jigyousyoData.nentenken[m - 1] == true) {
+                return 2;
+            }
+
+            return 0;
+        }
+
+        public static int getGetujiTenkenInfo(JigyousyoData jigyousyoData, string ym) {
+            if (ym.Length != 11)
+                return 0;
+            string momth = ym.Substring(5, 7);
+            if (Common.isNumeric(momth) == false) {
+                return 0;
+            }
+            int m = int.Parse(momth);
+            if (jigyousyoData.tukitenken[m - 1] == true) {
+                return 1;
+            }
+
+            return 0;
+        }
+
+        public static int getGetujiTenkenInfo(JigyousyoData jigyousyoData) {
+            string ym = makeYMD();
+            if (ym.Length != 11)
+                return 0;
+            string momth = ym.Substring(5, 7);
+            if (Common.isNumeric(momth) == false)
+                return 0;
+            int m = int.Parse(momth);
+            if (jigyousyoData.tukitenken[m - 1] == true) {
+                return 1;
+            }
+
+            return 0;
+        }
+
+        // 月額使用電力量/契約電力を計算する
+        public static string getSiyoudenryokuDivKeiyakuDenryoku(Item Heikin, Item Keiyaku) {
+            string ret = "";
+
+            ret = Common.getMultiply(Common.getDivide(Heikin.text, Keiyaku.text, 2), "30", 2);
+
+
+            //		Item genzaiNissuu = new Item(Common.getNissu(systemData.tenkenData.itemGenzaiKongetuHiduke.text, systemData.tenkenData.itemGenzaiSengetuHiduke.text),
+            //			 	 systemData.tenkenData.itemGenzaiKongetuHiduke.color, systemData.tenkenData.itemGenzaiKongetuHiduke.bgcolor);
+            //		Item kensinNissuu = new Item(Common.getNissu(systemData.tenkenData.itemKensinKongetuHiduke.text, systemData.tenkenData.itemKensinSengetuHiduke.text),
+            //				 systemData.tenkenData.itemKensinSengetuHiduke.color, systemData.tenkenData.itemKensinSengetuHiduke.bgcolor);
+            //
+            //		if(DataManager.equals(systemData.tenkenData.itemCheckboxYusen, "1")){
+            //			ret = Common.divide(getText(systemData.tenkenData.itemGenzaiDenryokuryou),
+            //								Common.multiply(genzaiNissuu.text, getText(systemData.tenkenData.itemKeiyakuDenryoku)));
+            //		}else{
+            //			ret = Common.divide(getText(systemData.tenkenData.itemKensinDenryokuryou),
+            //								Common.multiply(kensinNissuu.text, getText(systemData.tenkenData.itemKeiyakuDenryoku)));
+            //		}
+
+            return ret;
+        }
+
+        // SDカードに点検データを書き出す
+        //public static void writeToSDCard() {
+        //    try {
+        //        if (Common.getMountSDCard() != null) {
+        //            //ファイルの一覧を検索するディレクトリパスを指定する
+        //            string path = Common.getSystemPath();
+        //            string[] files = Directory.GetFiles(path, "*");
+        //                    Array.Sort(files);
+
+        //            if (Directory.Exists(Common.getMountSDCard() + "/geppou/data")) {
+        //                //System.out.println("ファイルは存在します");
+        //            } else {
+        //                //System.out.println("ファイルは存在しません");
+        //                Directory.CreateDirectory(Common.getMountSDCard() + "/geppou/data");
+        //            }
+
+        //            foreach (var file in files) {
+        //                FileCopy(file, pathSDCard + "/" + file.getName());
+        //}
+        //			}
+        //		} catch (Exception e) {
+        //    Log.e(TAG, "Unable to write to file");
+        //    return; // ファイルが見つからない場合
+        //}
+        //	}
+
+        public static void setHyuosiJigyoujyouName(SystemData systemData) {
+            if (isEmpty(systemData.tenkenData.hyousiData.itemAtena)) {
+                systemData.tenkenData.hyousiData.itemAtena = new Item("");
+            }
+            if (isEmpty(systemData.tenkenData.hyousiData.itemJigyoujyoumei)) {
+                systemData.tenkenData.hyousiData.itemJigyoujyoumei = new Item("");
+            }
+            if (systemData.tenkenData.hyousiData.itemAtena.text == "") {
+                systemData.tenkenData.hyousiData.itemAtena.text = systemData.jigyousyoData.textTitle + " " + systemData.jigyousyoData.textSubTitle;
+            }
+            if (systemData.tenkenData.hyousiData.itemJigyoujyoumei.text == "") {
+                systemData.tenkenData.hyousiData.itemJigyoujyoumei.text = systemData.jigyousyoData.textTitle + " " + systemData.jigyousyoData.textSubTitle;
+            }
+        }
+
+        public static void setKensinYMD(SystemData systemData) {
+            //フォーマットパターンを指定して表示する
             DateTime datetime = DateTime.Now;
-    if (DataManager.isEmpty(systemData.tenkenData.itemGenzaiKongetuHiduke)) {
-        systemData.tenkenData.itemGenzaiKongetuHiduke = new Item();
+            if (DataManager.isEmpty(systemData.tenkenData.itemGenzaiKongetuHiduke)) {
+                systemData.tenkenData.itemGenzaiKongetuHiduke = new Item();
                 systemData.tenkenData.itemGenzaiKongetuHiduke.text = datetime.ToString("yyyy年MM月dd日");
-        //System.out.println(sdf.format(cal.getTime()));
-    }
+                //System.out.println(sdf.format(cal.getTime()));
+            }
             datetime = datetime.AddMonths(-1);
-    if (DataManager.isEmpty(systemData.tenkenData.itemGenzaiSengetuHiduke)) {
-        systemData.tenkenData.itemGenzaiSengetuHiduke = new Item();
-        systemData.tenkenData.itemGenzaiSengetuHiduke.text = datetime.ToString("yyyy年MM月dd日");
-        //System.out.println(sdf.format(cal.getTime()));
-    }
+            if (DataManager.isEmpty(systemData.tenkenData.itemGenzaiSengetuHiduke)) {
+                systemData.tenkenData.itemGenzaiSengetuHiduke = new Item();
+                systemData.tenkenData.itemGenzaiSengetuHiduke.text = datetime.ToString("yyyy年MM月dd日");
+                //System.out.println(sdf.format(cal.getTime()));
+            }
             datetime = DateTime.Now;
             if (DataManager.isEmpty(systemData.tenkenData.itemKensinKongetuHiduke)) {
-        int year = datetime.Year;        // 現在の年を取得
-        int month = datetime.Month;  // 現在の月を取得
-        int day = datetime.Day;
-        if (!DataManager.isEmpty(systemData.tenkenData.itemKensinbi)) {
-            day = int.Parse(systemData.tenkenData.itemKensinbi.text);
-        }
-        systemData.tenkenData.itemKensinKongetuHiduke = new Item();
-        systemData.tenkenData.itemKensinKongetuHiduke.text = string.Format("{0:0000}年{1:00}月{2:00}日", year, month, day);
-        // 日付が正しくない時は補正する(2014/02/31 → 2014/02/29)
-        if (!Common.checkDate(systemData.tenkenData.itemKensinKongetuHiduke.text)) {
-                    day = int.Parse(Common.getLastDay(systemData.tenkenData.itemKensinKongetuHiduke.text));
-            systemData.tenkenData.itemKensinKongetuHiduke.text = string.Format("{0:0000}年{1:00}月{2:00}日", year, month, day);
+                int year = datetime.Year;        // 現在の年を取得
+                int month = datetime.Month;  // 現在の月を取得
+                int day = datetime.Day;
+                if (!DataManager.isEmpty(systemData.tenkenData.itemKensinbi)) {
+                    day = int.Parse(systemData.tenkenData.itemKensinbi.text);
                 }
-    }
+                systemData.tenkenData.itemKensinKongetuHiduke = new Item();
+                systemData.tenkenData.itemKensinKongetuHiduke.text = string.Format("{0:0000}年{1:00}月{2:00}日", year, month, day);
+                // 日付が正しくない時は補正する(2014/02/31 → 2014/02/29)
+                if (!Common.checkDate(systemData.tenkenData.itemKensinKongetuHiduke.text)) {
+                    day = int.Parse(Common.getLastDay(systemData.tenkenData.itemKensinKongetuHiduke.text));
+                    systemData.tenkenData.itemKensinKongetuHiduke.text = string.Format("{0:0000}年{1:00}月{2:00}日", year, month, day);
+                }
+            }
             datetime = datetime.AddMonths(-1);            // 先月の月を取得
             if (DataManager.isEmpty(systemData.tenkenData.itemKensinSengetuHiduke)) {
-        int year = datetime.Year;        // 現在の年を取得
-        int month = datetime.Month;  // 現在の月を取得
-        int day = datetime.Day;
-        if (!DataManager.isEmpty(systemData.tenkenData.itemKensinbi)) {
-            day = int.Parse(systemData.tenkenData.itemKensinbi.text);
-        }
-        systemData.tenkenData.itemKensinSengetuHiduke = new Item();
-        systemData.tenkenData.itemKensinSengetuHiduke.text = string.Format("{0:0000}年{1:00}月{2:00}日", year, month, day);
+                int year = datetime.Year;        // 現在の年を取得
+                int month = datetime.Month;  // 現在の月を取得
+                int day = datetime.Day;
+                if (!DataManager.isEmpty(systemData.tenkenData.itemKensinbi)) {
+                    day = int.Parse(systemData.tenkenData.itemKensinbi.text);
+                }
+                systemData.tenkenData.itemKensinSengetuHiduke = new Item();
+                systemData.tenkenData.itemKensinSengetuHiduke.text = string.Format("{0:0000}年{1:00}月{2:00}日", year, month, day);
                 // 日付が正しくない時は補正する(2014/02/31 → 2014/02/29)
                 if (!Common.checkDate(systemData.tenkenData.itemKensinSengetuHiduke.text)) {
                     day = int.Parse(Common.getLastDay(systemData.tenkenData.itemKensinKongetuHiduke.text));
                     systemData.tenkenData.itemKensinKongetuHiduke.text = string.Format("{0:0000}年{1:00}月{2:00}日", year, month, day);
                 }
                 //System.out.println(sdf.format(cal.getTime()));
-    }
-}
+            }
+        }
 
 
-public static void setKensinYMDDenryokuryou(SystemData systemData) {
-    //フォーマットパターンを指定して表示する
+        public static void setKensinYMDDenryokuryou(SystemData systemData) {
+            //フォーマットパターンを指定して表示する
             DateTime datetime = DateTime.Now;
             if (DataManager.isEmpty(systemData.tenkenData.itemGenzaiKongetuHiduke)) {
-        systemData.tenkenData.itemGenzaiKongetuHiduke = new Item();
-        systemData.tenkenData.itemGenzaiKongetuHiduke.text = datetime.ToString("yyyy年MM月dd日");
-        //System.out.println(sdf.format(cal.getTime()));
-    }
+                systemData.tenkenData.itemGenzaiKongetuHiduke = new Item();
+                systemData.tenkenData.itemGenzaiKongetuHiduke.text = datetime.ToString("yyyy年MM月dd日");
+                //System.out.println(sdf.format(cal.getTime()));
+            }
             datetime = datetime.AddMonths(-1);            // 先月の月を取得
             if (DataManager.isEmpty(systemData.tenkenData.itemGenzaiSengetuHiduke)) {
-        systemData.tenkenData.itemGenzaiSengetuHiduke = new Item();
+                systemData.tenkenData.itemGenzaiSengetuHiduke = new Item();
                 systemData.tenkenData.itemGenzaiSengetuHiduke.text = datetime.ToString("yyyy年MM月dd日");
-        // System.out.println(sdf.format(cal.getTime()));
-    }
+                // System.out.println(sdf.format(cal.getTime()));
+            }
             datetime = DateTime.Now;
             int year = datetime.Year;        // 現在の年を取得
-    int month = datetime.Month;  // 現在の月を取得
-    int day = datetime.Day;
-    if (!DataManager.isEmpty(systemData.tenkenData.itemKensinbi)) {
-        day = int.Parse(systemData.tenkenData.itemKensinbi.text);
-    }
-    systemData.tenkenData.itemKensinKongetuHiduke = new Item();
-    systemData.tenkenData.itemKensinKongetuHiduke.text = string.Format("{0:0000}年{1:00}月{2:00}日", year, month, day);
-    // 日付が正しくない時は補正する(2014/02/31 → 2014/02/29)
-    if (!Common.checkDate(systemData.tenkenData.itemKensinKongetuHiduke.text)) {
+            int month = datetime.Month;  // 現在の月を取得
+            int day = datetime.Day;
+            if (!DataManager.isEmpty(systemData.tenkenData.itemKensinbi)) {
+                day = int.Parse(systemData.tenkenData.itemKensinbi.text);
+            }
+            systemData.tenkenData.itemKensinKongetuHiduke = new Item();
+            systemData.tenkenData.itemKensinKongetuHiduke.text = string.Format("{0:0000}年{1:00}月{2:00}日", year, month, day);
+            // 日付が正しくない時は補正する(2014/02/31 → 2014/02/29)
+            if (!Common.checkDate(systemData.tenkenData.itemKensinKongetuHiduke.text)) {
                 day = int.Parse(Common.getLastDay(systemData.tenkenData.itemKensinKongetuHiduke.text));
                 systemData.tenkenData.itemKensinKongetuHiduke.text = string.Format("{0:0000}年{1:00}月{2:00}日", year, month, day);
             }
-    //System.out.println(sdf.format(cal.getTime()));
-}
-
-public static string getYYMM(Item itemData) {
-    Item workData = itemData.clone();
-    if (workData == null || workData.text == null)
-        return "";
-    string strDate = workData.text;
-    strDate = strDate.Replace("年", "/").Replace("月", "");
-    string[] MMDD;
-    MMDD = strDate.Split("/");
-    if (MMDD.Length != 2)
-        return "";
-    return MMDD[0].Substring(2, 4) + "/" + MMDD[1];
-}
-
-public static string getMM(Item itemData) {
-    Item workData = itemData.clone();
-    if (workData == null)
-        return "";
-    string strDate = workData.text;
-    strDate = strDate.Replace("年", "/").Replace("月", "");
-    string[] MMDD;
-    MMDD = strDate.Split("/");
-    if (MMDD.Length != 2)
-        return "";
-    return MMDD[1];
-}
-
-public static string getMMDD(Item itemData) {
-    Item workData = itemData.clone();
-    if (workData == null)
-        return "";
-    string strDate = workData.text;
-    strDate = strDate.Replace("年", "/").Replace("月", "/").Replace("日", "");
-    string[] MMDD;
-    MMDD = strDate.Split("/");
-    if (MMDD.Length != 3)
-        return "";
-    return MMDD[1] + "月" + MMDD[2] + "日";
-}
-
-public static string getYYMMWarekiNengou(SystemData systemData, WarekiData _wareki, Item itemDate) {
-    Item workData = itemDate.clone();
-    if (workData == null)
-        return "";
-    workData.text = workData.text.Replace("年", "/").Replace("月", "/").Replace("日", "");
-    string[] YYYYMM = workData.text.Split("/");
-    if (YYYYMM.Length != 2)
-        return "";
-    string Nengo = Common.getNengouAlphabet(_wareki, YYYYMM[0], YYYYMM[1], "01");
-    if (workData.text.Substring(workData.text.Length - 1, workData.text.Length) == "/") {
-        workData.text += "01";
-    }
-    string wareki = Common.getWareki(systemData, workData.text);
-    return Nengo + " " + wareki + "年" + YYYYMM[1] + "月";
-}
-
-public static string getPlus(Item itemNum1, Item itemNum2, Item itemNum3, Item itemNum4) {
-    if (DataManager.isEmpty(itemNum1) == true)
-        return "";
-    if (DataManager.isEmpty(itemNum2) == true)
-        return "";
-    if (DataManager.isEmpty(itemNum3) == true)
-        return "";
-    if (DataManager.isEmpty(itemNum4) == true)
-        return "";
-    return Common.getPlus(itemNum1.text, itemNum2.text, itemNum3.text, itemNum4.text);
-}
-
-public static string getMinus(Item itemNum1, Item itemNum2) {
-    if (DataManager.isEmpty(itemNum1) == true)
-        return "";
-    if (DataManager.isEmpty(itemNum2) == true)
-        return "";
-    return Common.getMinus(itemNum1.text, itemNum2.text);
-}
-
-public static string getMinusKenshin(Item itemNum1, Item itemNum2) {
-    if (DataManager.isEmpty(itemNum1) == true)
-        return "";
-    if (DataManager.isEmpty(itemNum2) == true)
-        return "";
-
-    string retstring = "";
-    itemNum1.text = itemNum1.text.Trim();
-    itemNum2.text = itemNum2.text.Trim();
-    itemNum1.text = itemNum1.text.Replace(",", "");
-    itemNum2.text = itemNum2.text.Replace(",", "");
-    if (isNumeric(itemNum1) && isNumeric(itemNum2)) {
-       decimal dec1 = decimal.Parse(itemNum1.text), dec2 = decimal.Parse(itemNum2.text);
-        decimal dec = dec1 - dec2;
-        if (dec1.CompareTo(dec2) < 0) {
-            int keta = (dec2 == 0) ? 1 : ((int)Math.Log10((double)dec2) + 1);
-                    decimal maxKenshinti = (decimal)Math.Pow(10, keta);
-            dec = maxKenshinti - dec2;
-            dec = dec + dec1;
+            //System.out.println(sdf.format(cal.getTime()));
         }
-        retstring = dec.ToString();
-    }
-    return retstring;
-}
 
-public static string getMeterReset(Item itemNum1, Item itemNum2) {
-    if (DataManager.isEmpty(itemNum1) == true)
-        return "";
-    if (DataManager.isEmpty(itemNum2) == true)
-        return "";
+        public static string getYYMM(Item itemData) {
+            Item workData = itemData.clone();
+            if (workData == null || workData.text == null)
+                return "";
+            string strDate = workData.text;
+            strDate = strDate.Replace("年", "/").Replace("月", "");
+            string[] MMDD;
+            MMDD = strDate.Split("/");
+            if (MMDD.Length != 2)
+                return "";
+            return MMDD[0].Substring(2, 4) + "/" + MMDD[1];
+        }
 
-    string retstring = "";
-    itemNum1.text = itemNum1.text.Trim();
-    itemNum2.text = itemNum2.text.Trim();
-    itemNum1.text = itemNum1.text.Replace(",", "");
-    itemNum2.text = itemNum2.text.Replace(",", "");
-    if (isNumeric(itemNum1) && isNumeric(itemNum2)) {
-        decimal dec1 = decimal.Parse(itemNum1.text), dec2 = decimal.Parse(itemNum2.text);
+        public static string getMM(Item itemData) {
+            Item workData = itemData.clone();
+            if (workData == null)
+                return "";
+            string strDate = workData.text;
+            strDate = strDate.Replace("年", "/").Replace("月", "");
+            string[] MMDD;
+            MMDD = strDate.Split("/");
+            if (MMDD.Length != 2)
+                return "";
+            return MMDD[1];
+        }
+
+        public static string getMMDD(Item itemData) {
+            Item workData = itemData.clone();
+            if (workData == null)
+                return "";
+            string strDate = workData.text;
+            strDate = strDate.Replace("年", "/").Replace("月", "/").Replace("日", "");
+            string[] MMDD;
+            MMDD = strDate.Split("/");
+            if (MMDD.Length != 3)
+                return "";
+            return MMDD[1] + "月" + MMDD[2] + "日";
+        }
+
+        public static string getYYMMWarekiNengou(SystemData systemData, WarekiData _wareki, Item itemDate) {
+            Item workData = itemDate.clone();
+            if (workData == null)
+                return "";
+            workData.text = workData.text.Replace("年", "/").Replace("月", "/").Replace("日", "");
+            string[] YYYYMM = workData.text.Split("/");
+            if (YYYYMM.Length != 2)
+                return "";
+            string Nengo = Common.getNengouAlphabet(_wareki, YYYYMM[0], YYYYMM[1], "01");
+            if (workData.text.Substring(workData.text.Length - 1, workData.text.Length) == "/") {
+                workData.text += "01";
+            }
+            string wareki = Common.getWareki(systemData, workData.text);
+            return Nengo + " " + wareki + "年" + YYYYMM[1] + "月";
+        }
+
+        public static string getPlus(Item itemNum1, Item itemNum2, Item itemNum3, Item itemNum4) {
+            if (DataManager.isEmpty(itemNum1) == true)
+                return "";
+            if (DataManager.isEmpty(itemNum2) == true)
+                return "";
+            if (DataManager.isEmpty(itemNum3) == true)
+                return "";
+            if (DataManager.isEmpty(itemNum4) == true)
+                return "";
+            return Common.getPlus(itemNum1.text, itemNum2.text, itemNum3.text, itemNum4.text);
+        }
+
+        public static string getMinus(Item itemNum1, Item itemNum2) {
+            if (DataManager.isEmpty(itemNum1) == true)
+                return "";
+            if (DataManager.isEmpty(itemNum2) == true)
+                return "";
+            return Common.getMinus(itemNum1.text, itemNum2.text);
+        }
+
+        public static string getMinusKenshin(Item itemNum1, Item itemNum2) {
+            if (DataManager.isEmpty(itemNum1) == true)
+                return "";
+            if (DataManager.isEmpty(itemNum2) == true)
+                return "";
+
+            string retstring = "";
+            itemNum1.text = itemNum1.text.Trim();
+            itemNum2.text = itemNum2.text.Trim();
+            itemNum1.text = itemNum1.text.Replace(",", "");
+            itemNum2.text = itemNum2.text.Replace(",", "");
+            if (isNumeric(itemNum1) && isNumeric(itemNum2)) {
+                decimal dec1 = decimal.Parse(itemNum1.text), dec2 = decimal.Parse(itemNum2.text);
                 decimal dec = dec1 - dec2;
-        if (dec1.CompareTo(dec2) < 0) {
-            int keta = (dec2 == 0) ? 1 : ((int)Math.Log10((double)dec2) + 1);
+                if (dec1.CompareTo(dec2) < 0) {
+                    int keta = (dec2 == 0) ? 1 : ((int)Math.Log10((double)dec2) + 1);
                     decimal maxKenshinti = (decimal)Math.Pow(10, keta);
                     dec = maxKenshinti - dec2;
+                    dec = dec + dec1;
+                }
+                retstring = dec.ToString();
+            }
+            return retstring;
         }
-        retstring = dec.ToString();
-    }
-    return retstring;
-}
 
-public static string getMultiply(Item itemNum1, Item itemNum2, int keta) {
-    if (DataManager.isEmpty(itemNum1) == true)
-        return "0";
-    if (DataManager.isEmpty(itemNum2) == true)
-        return "0";
-    if (isZero(itemNum1) || isZero(itemNum2))
-        return "0";
-    return Common.getMultiply(itemNum1.text, itemNum2.text, keta);
-}
+        public static string getMeterReset(Item itemNum1, Item itemNum2) {
+            if (DataManager.isEmpty(itemNum1) == true)
+                return "";
+            if (DataManager.isEmpty(itemNum2) == true)
+                return "";
 
-public static string makeFukaritu(Item itemR, Item itemS, Item itemT, Item itemTeikaku) {
-    Item iR = itemR.clone();
-    Item iS = itemS.clone();
-    Item iT = itemT.clone();
-    Item iTeikaku = itemTeikaku.clone();
-    if (DataManager.isEmpty(iR) == true)
-        iR = new Item("0");
-    if (DataManager.isEmpty(iS) == true)
-        iS = new Item("0");
-    if (DataManager.isEmpty(iT) == true)
-        iT = new Item("0");
-    if (DataManager.isEmpty(iTeikaku) == true)
-        return "";
-
-    long r = Common.toLong(iR.text);
-    long s = Common.toLong(iS.text);
-    long t = Common.toLong(iT.text);
-    double teikaku = Common.toDouble(iTeikaku.text);
-    double maxDenryu = (double)Common.getMaxData(r, s, t);
-    double fukaritu = 0.0;
-    if (teikaku != 0) {
-        fukaritu = maxDenryu / teikaku * 100.0;
-    } else {
-        return "";
-    }
-    decimal bd = (decimal)fukaritu;
-    bd = Common.Round(bd, -2); // 小数点第2位を四捨五入
-
-    return bd.ToString("#,###.#");
-}
-
-public static string getDivide(Item itemNum1, Item itemNum2, int keta) {
-    if (DataManager.isEmpty(itemNum1) == true)
-        return "0";
-    if (DataManager.isEmpty(itemNum2) == true)
-        return "0";
-    if (isZero(itemNum1) || isZero(itemNum2))
-        return "0";
-    return Common.getDivide(itemNum1.text, itemNum2.text, keta);
-}
-
-public static string getRikiritu(SystemData systemData) {
-    string retRikiritu = "";
-
-    if (systemData.settei.flagRikirituSettei == true) { // 力率自動計算に設定されている場合は、今月力率を消す
-        if (DataManager.equals(systemData.tenkenData.itemCheckboxYusen, "2")) { // 現在値を印刷する
-            retRikiritu = getDivide(systemData.tenkenData.itemGenzaiKongetuMukoDenryoku, systemData.tenkenData.itemGenzaiKongetuYukoDenryoku, 4);
-        } else {
-            retRikiritu = getDivide(systemData.tenkenData.itemKensinKongetuMukoDenryoku, systemData.tenkenData.itemKensinKongetuYukoDenryoku, 4);
+            string retstring = "";
+            itemNum1.text = itemNum1.text.Trim();
+            itemNum2.text = itemNum2.text.Trim();
+            itemNum1.text = itemNum1.text.Replace(",", "");
+            itemNum2.text = itemNum2.text.Replace(",", "");
+            if (isNumeric(itemNum1) && isNumeric(itemNum2)) {
+                decimal dec1 = decimal.Parse(itemNum1.text), dec2 = decimal.Parse(itemNum2.text);
+                decimal dec = dec1 - dec2;
+                if (dec1.CompareTo(dec2) < 0) {
+                    int keta = (dec2 == 0) ? 1 : ((int)Math.Log10((double)dec2) + 1);
+                    decimal maxKenshinti = (decimal)Math.Pow(10, keta);
+                    dec = maxKenshinti - dec2;
+                }
+                retstring = dec.ToString();
+            }
+            return retstring;
         }
-        if (0 <= retRikiritu.CompareTo("0.0000") && retRikiritu.CompareTo("0.1004") <= 0)
-            retRikiritu = "100";
-        else if (0 <= retRikiritu.CompareTo("0.1005") && retRikiritu.CompareTo("0.1752") <= 0)
-            retRikiritu = "99";
-        else if (0 <= retRikiritu.CompareTo("0.1753") && retRikiritu.CompareTo("0.2279") <= 0)
-            retRikiritu = "98";
-        else if (0 <= retRikiritu.CompareTo("0.2280") && retRikiritu.CompareTo("0.2718") <= 0)
-            retRikiritu = "97";
-        else if (0 <= retRikiritu.CompareTo("0.2719") && retRikiritu.CompareTo("0.3106") <= 0)
-            retRikiritu = "96";
-        else if (0 <= retRikiritu.CompareTo("0.3107") && retRikiritu.CompareTo("0.3461") <= 0)
-            retRikiritu = "95";
-        else if (0 <= retRikiritu.CompareTo("0.3462") && retRikiritu.CompareTo("0.3793") <= 0)
-            retRikiritu = "94";
-        else if (0 <= retRikiritu.CompareTo("0.3794") && retRikiritu.CompareTo("0.4108") <= 0)
-            retRikiritu = "93";
-        else if (0 <= retRikiritu.CompareTo("0.4109") && retRikiritu.CompareTo("0.4409") <= 0)
-            retRikiritu = "92";
-        else if (0 <= retRikiritu.CompareTo("0.4410") && retRikiritu.CompareTo("0.4701") <= 0)
-            retRikiritu = "91";
-        else if (0 <= retRikiritu.CompareTo("0.4702") && retRikiritu.CompareTo("0.4984") <= 0)
-            retRikiritu = "90";
-        else if (0 <= retRikiritu.CompareTo("0.4985") && retRikiritu.CompareTo("0.5261") <= 0)
-            retRikiritu = "89";
-        else if (0 <= retRikiritu.CompareTo("0.5262") && retRikiritu.CompareTo("0.5533") <= 0)
-            retRikiritu = "88";
-        else if (0 <= retRikiritu.CompareTo("0.5534") && retRikiritu.CompareTo("0.5801") <= 0)
-            retRikiritu = "87";
-        else if (0 <= retRikiritu.CompareTo("0.5802") && retRikiritu.CompareTo("0.6066") <= 0)
-            retRikiritu = "86";
-        else if (0 <= retRikiritu.CompareTo("0.6067") && retRikiritu.CompareTo("0.6329") <= 0)
-            retRikiritu = "85";
-        else
-            retRikiritu = "85";
-        if (DataManager.equals(systemData.tenkenData.itemCheckboxYusen, "2")) { // 現在値を印刷する
-            systemData.tenkenData.itemGenzaiKongetuRikiritu.text = retRikiritu;
-        } else {
-            systemData.tenkenData.itemKensinKongetuRikiritu.text = retRikiritu;
-        }
-    } else {
-        retRikiritu = systemData.tenkenData.itemKensinKongetuRikiritu.text;
-    }
-    return retRikiritu;
-}
 
-public static void execSaidaiDenryoku(SystemData systemData) {
-    string saidaiDenryoku = DataManager.getMultiply(
-            systemData.tenkenData.itemKensinKongetuSaidaiDenryoku,
-            systemData.tenkenData.itemJyouritu, 0);
-    saidaiDenryoku = DataManager.round(saidaiDenryoku, DataManager.ROUND_OFF);
-    //		saidaiDenryoku = Common.formatDecimal(saidaiDenryoku);
-    long lSaidaiDenryoku = Common.toLong(saidaiDenryoku);
-    long lSaidaiDenryokuNow = 0L;
-    if (!isEmpty(systemData.tenkenData.itemKeiyakuDenryoku)) {
-        lSaidaiDenryokuNow = Common.toLong(systemData.tenkenData.itemKeiyakuDenryoku.text);
-    }
+        public static string getMultiply(Item itemNum1, Item itemNum2, int keta) {
+            if (DataManager.isEmpty(itemNum1) == true)
+                return "0";
+            if (DataManager.isEmpty(itemNum2) == true)
+                return "0";
+            if (isZero(itemNum1) || isZero(itemNum2))
+                return "0";
+            return Common.getMultiply(itemNum1.text, itemNum2.text, keta);
+        }
 
-    // 現在の契約電力より、今月のデマンドが大きかった場合
-    if (lSaidaiDenryokuNow < lSaidaiDenryoku) {
-        systemData.tenkenData.itemKeiyakuDenryoku.text = saidaiDenryoku;
-        if (DataManager.isEmpty(systemData.tenkenData.itemKeiyakuDenryokuKakuteiYM)) {
-            systemData.tenkenData.itemKeiyakuDenryokuKakuteiYM = new Item();
+        public static string makeFukaritu(Item itemR, Item itemS, Item itemT, Item itemTeikaku) {
+            Item iR = itemR.clone();
+            Item iS = itemS.clone();
+            Item iT = itemT.clone();
+            Item iTeikaku = itemTeikaku.clone();
+            if (DataManager.isEmpty(iR) == true)
+                iR = new Item("0");
+            if (DataManager.isEmpty(iS) == true)
+                iS = new Item("0");
+            if (DataManager.isEmpty(iT) == true)
+                iT = new Item("0");
+            if (DataManager.isEmpty(iTeikaku) == true)
+                return "";
+
+            long r = Common.toLong(iR.text);
+            long s = Common.toLong(iS.text);
+            long t = Common.toLong(iT.text);
+            double teikaku = Common.toDouble(iTeikaku.text);
+            double maxDenryu = (double)Common.getMaxData(r, s, t);
+            double fukaritu = 0.0;
+            if (teikaku != 0) {
+                fukaritu = maxDenryu / teikaku * 100.0;
+            } else {
+                return "";
+            }
+            decimal bd = (decimal)fukaritu;
+            bd = Common.Round(bd, -2); // 小数点第2位を四捨五入
+
+            return bd.ToString("#,###.#");
         }
-        if (DataManager.isEmpty(systemData.tenkenData.itemTenkenNijtijiYMD)) {
-            return;
+
+        public static string getDivide(Item itemNum1, Item itemNum2, int keta) {
+            if (DataManager.isEmpty(itemNum1) == true)
+                return "0";
+            if (DataManager.isEmpty(itemNum2) == true)
+                return "0";
+            if (isZero(itemNum1) || isZero(itemNum2))
+                return "0";
+            return Common.getDivide(itemNum1.text, itemNum2.text, keta);
         }
-        systemData.tenkenData.itemKeiyakuDenryokuKakuteiYM.text = Common.makeYYMM(Common.toCalendar(systemData.tenkenData.itemTenkenNijtijiYMD.text));
-    }
-    // これ以降、昨年同月から一年経過して、昨年の契約電力のままということは、一年経過した時点で契約電力が下がるという処理
-    if (DataManager.isEmpty(systemData.tenkenData.itemTenkenNijtijiYMD)) {
-        return;
-    }
-    if (systemData.tenkenData.itemKeiyakuDenryokuKakuteiYM.text.Length == 0 || systemData.tenkenData.itemTenkenNijtijiYMD.text.Length == 0) {
-        return;
-    }
-    DateTime calSaidai = Common.toCalendar(systemData.tenkenData.itemTenkenNijtijiYMD.text);
-    calSaidai = calSaidai.AddYears(-1);
-    string SaidaiYM_minus_1 = Common.makeYYMM(calSaidai);
-    string SaidaiYM = Common.makeYYMM(Common.toCalendar(systemData.tenkenData.itemKeiyakuDenryokuKakuteiYM.text + "/01"));
-    long KeiyakuDenryoku = Common.toLong(saidaiDenryoku);
-    //		systemData.tenkenData.itemKeiyakuDenryoku.text = saidaiDenryoku;
-    //		systemData.tenkenData.itemKeiyakuDenryokuKakuteiYM.text = Common.makeYYMM(jp.increase.Billing.Common.toCalendar(systemData.tenkenData.itemTenkenNijtijiYMD.text));
-    if (SaidaiYM == SaidaiYM_minus_1 || SaidaiYM.CompareTo(SaidaiYM_minus_1) < 0) {
-        for (int i = 0; i < 12 - 2; i++) { // 過去11ヶ月のうち一番高いデマンドを設定する
-            if (KeiyakuDenryoku < Common.toLong(systemData.tenkenData.textKakoDemandData[i])) {
-                KeiyakuDenryoku = Common.toLong(systemData.tenkenData.textKakoDemandData[i]);
-                systemData.tenkenData.itemKeiyakuDenryoku.text = systemData.tenkenData.textKakoDemandData[i];
-                systemData.tenkenData.itemKeiyakuDenryokuKakuteiYM.text = systemData.tenkenData.textKakoTuki[i];
+
+        public static string getRikiritu(SystemData systemData) {
+            string retRikiritu = "";
+
+            if (systemData.settei.flagRikirituSettei == true) { // 力率自動計算に設定されている場合は、今月力率を消す
+                if (DataManager.equals(systemData.tenkenData.itemCheckboxYusen, "2")) { // 現在値を印刷する
+                    retRikiritu = getDivide(systemData.tenkenData.itemGenzaiKongetuMukoDenryoku, systemData.tenkenData.itemGenzaiKongetuYukoDenryoku, 4);
+                } else {
+                    retRikiritu = getDivide(systemData.tenkenData.itemKensinKongetuMukoDenryoku, systemData.tenkenData.itemKensinKongetuYukoDenryoku, 4);
+                }
+                if (0 <= retRikiritu.CompareTo("0.0000") && retRikiritu.CompareTo("0.1004") <= 0)
+                    retRikiritu = "100";
+                else if (0 <= retRikiritu.CompareTo("0.1005") && retRikiritu.CompareTo("0.1752") <= 0)
+                    retRikiritu = "99";
+                else if (0 <= retRikiritu.CompareTo("0.1753") && retRikiritu.CompareTo("0.2279") <= 0)
+                    retRikiritu = "98";
+                else if (0 <= retRikiritu.CompareTo("0.2280") && retRikiritu.CompareTo("0.2718") <= 0)
+                    retRikiritu = "97";
+                else if (0 <= retRikiritu.CompareTo("0.2719") && retRikiritu.CompareTo("0.3106") <= 0)
+                    retRikiritu = "96";
+                else if (0 <= retRikiritu.CompareTo("0.3107") && retRikiritu.CompareTo("0.3461") <= 0)
+                    retRikiritu = "95";
+                else if (0 <= retRikiritu.CompareTo("0.3462") && retRikiritu.CompareTo("0.3793") <= 0)
+                    retRikiritu = "94";
+                else if (0 <= retRikiritu.CompareTo("0.3794") && retRikiritu.CompareTo("0.4108") <= 0)
+                    retRikiritu = "93";
+                else if (0 <= retRikiritu.CompareTo("0.4109") && retRikiritu.CompareTo("0.4409") <= 0)
+                    retRikiritu = "92";
+                else if (0 <= retRikiritu.CompareTo("0.4410") && retRikiritu.CompareTo("0.4701") <= 0)
+                    retRikiritu = "91";
+                else if (0 <= retRikiritu.CompareTo("0.4702") && retRikiritu.CompareTo("0.4984") <= 0)
+                    retRikiritu = "90";
+                else if (0 <= retRikiritu.CompareTo("0.4985") && retRikiritu.CompareTo("0.5261") <= 0)
+                    retRikiritu = "89";
+                else if (0 <= retRikiritu.CompareTo("0.5262") && retRikiritu.CompareTo("0.5533") <= 0)
+                    retRikiritu = "88";
+                else if (0 <= retRikiritu.CompareTo("0.5534") && retRikiritu.CompareTo("0.5801") <= 0)
+                    retRikiritu = "87";
+                else if (0 <= retRikiritu.CompareTo("0.5802") && retRikiritu.CompareTo("0.6066") <= 0)
+                    retRikiritu = "86";
+                else if (0 <= retRikiritu.CompareTo("0.6067") && retRikiritu.CompareTo("0.6329") <= 0)
+                    retRikiritu = "85";
+                else
+                    retRikiritu = "85";
+                if (DataManager.equals(systemData.tenkenData.itemCheckboxYusen, "2")) { // 現在値を印刷する
+                    systemData.tenkenData.itemGenzaiKongetuRikiritu.text = retRikiritu;
+                } else {
+                    systemData.tenkenData.itemKensinKongetuRikiritu.text = retRikiritu;
+                }
+            } else {
+                retRikiritu = systemData.tenkenData.itemKensinKongetuRikiritu.text;
+            }
+            return retRikiritu;
+        }
+
+        public static void execSaidaiDenryoku(SystemData systemData) {
+            string saidaiDenryoku = DataManager.getMultiply(
+                    systemData.tenkenData.itemKensinKongetuSaidaiDenryoku,
+                    systemData.tenkenData.itemJyouritu, 0);
+            saidaiDenryoku = DataManager.round(saidaiDenryoku, DataManager.ROUND_OFF);
+            //		saidaiDenryoku = Common.formatDecimal(saidaiDenryoku);
+            long lSaidaiDenryoku = Common.toLong(saidaiDenryoku);
+            long lSaidaiDenryokuNow = 0L;
+            if (!isEmpty(systemData.tenkenData.itemKeiyakuDenryoku)) {
+                lSaidaiDenryokuNow = Common.toLong(systemData.tenkenData.itemKeiyakuDenryoku.text);
+            }
+
+            // 現在の契約電力より、今月のデマンドが大きかった場合
+            if (lSaidaiDenryokuNow < lSaidaiDenryoku) {
+                systemData.tenkenData.itemKeiyakuDenryoku.text = saidaiDenryoku;
+                if (DataManager.isEmpty(systemData.tenkenData.itemKeiyakuDenryokuKakuteiYM)) {
+                    systemData.tenkenData.itemKeiyakuDenryokuKakuteiYM = new Item();
+                }
+                if (DataManager.isEmpty(systemData.tenkenData.itemTenkenNijtijiYMD)) {
+                    return;
+                }
+                systemData.tenkenData.itemKeiyakuDenryokuKakuteiYM.text = Common.makeYYMM(Common.toCalendar(systemData.tenkenData.itemTenkenNijtijiYMD.text));
+            }
+            // これ以降、昨年同月から一年経過して、昨年の契約電力のままということは、一年経過した時点で契約電力が下がるという処理
+            if (DataManager.isEmpty(systemData.tenkenData.itemTenkenNijtijiYMD)) {
+                return;
+            }
+            if (systemData.tenkenData.itemKeiyakuDenryokuKakuteiYM.text.Length == 0 || systemData.tenkenData.itemTenkenNijtijiYMD.text.Length == 0) {
+                return;
+            }
+            DateTime calSaidai = Common.toCalendar(systemData.tenkenData.itemTenkenNijtijiYMD.text);
+            calSaidai = calSaidai.AddYears(-1);
+            string SaidaiYM_minus_1 = Common.makeYYMM(calSaidai);
+            string SaidaiYM = Common.makeYYMM(Common.toCalendar(systemData.tenkenData.itemKeiyakuDenryokuKakuteiYM.text + "/01"));
+            long KeiyakuDenryoku = Common.toLong(saidaiDenryoku);
+            //		systemData.tenkenData.itemKeiyakuDenryoku.text = saidaiDenryoku;
+            //		systemData.tenkenData.itemKeiyakuDenryokuKakuteiYM.text = Common.makeYYMM(jp.increase.Billing.Common.toCalendar(systemData.tenkenData.itemTenkenNijtijiYMD.text));
+            if (SaidaiYM == SaidaiYM_minus_1 || SaidaiYM.CompareTo(SaidaiYM_minus_1) < 0) {
+                for (int i = 0; i < 12 - 2; i++) { // 過去11ヶ月のうち一番高いデマンドを設定する
+                    if (KeiyakuDenryoku < Common.toLong(systemData.tenkenData.textKakoDemandData[i])) {
+                        KeiyakuDenryoku = Common.toLong(systemData.tenkenData.textKakoDemandData[i]);
+                        systemData.tenkenData.itemKeiyakuDenryoku.text = systemData.tenkenData.textKakoDemandData[i];
+                        systemData.tenkenData.itemKeiyakuDenryokuKakuteiYM.text = systemData.tenkenData.textKakoTuki[i];
+                    }
+                }
             }
         }
+
+        public static SystemData setFreeFormatFileName(SystemData systemData) {
+            if (Common.isEmpty(systemData.jigyousyoData.textCyouhyouFreeFormatFileName) != true) {
+                systemData.tenkenData.textCyouhyouFreeFormatFlag = "1";
+                systemData.tenkenData.textCyouhyouFreeFormatFileName = systemData.settei.textCyouhyouFreeFormatFileName;
+                systemData.jigyousyoData.textCyouhyouFreeFormatFileName = ""; // 初期化する
+                DataManager.writeJigyousyo(systemData.listJigyousyo);
+                //	        DataManager.writeTenken(context, systemData, systemData.tenkenFileName);
+            }
+            return systemData;
+        }
     }
-}
 
-public static SystemData setFreeFormatFileName(SystemData systemData) {
-    if (Common.isEmpty(systemData.jigyousyoData.textCyouhyouFreeFormatFileName) != true) {
-        systemData.tenkenData.textCyouhyouFreeFormatFlag = "1";
-        systemData.tenkenData.textCyouhyouFreeFormatFileName = systemData.settei.textCyouhyouFreeFormatFileName;
-        systemData.jigyousyoData.textCyouhyouFreeFormatFileName = ""; // 初期化する
-        DataManager.writeJigyousyo(systemData.listJigyousyo);
-        //	        DataManager.writeTenken(context, systemData, systemData.tenkenFileName);
-    }
-    return systemData;
-}
-}
+    // 点検データの並べ替えに使用する
+    //class TenkenDataComparator implements Comparator<File> {
 
-// 点検データの並べ替えに使用する
-//class TenkenDataComparator implements Comparator<File> {
+    //    @Override
 
-//    @Override
-
-//    public int compare(File arg0, File arg1) { // 同じファイル名はありえないので比較処理しない
-//    int n1 = arg0.getName().length();
-//    int n2 = arg1.getName().length();
-//    return n1 < n2 ? 1 : -1;
-//}
-//}
+    //    public int compare(File arg0, File arg1) { // 同じファイル名はありえないので比較処理しない
+    //    int n1 = arg0.getName().length();
+    //    int n2 = arg1.getName().length();
+    //    return n1 < n2 ? 1 : -1;
+    //}
+    //}
 }
