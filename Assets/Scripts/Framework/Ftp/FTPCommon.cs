@@ -1,11 +1,15 @@
-﻿using PreGeppou.Data;
+﻿using FluentFTP;
+using PreGeppou.Data;
 using PreGeppou.Framework.Data;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
+using static System.Net.WebRequestMethods;
+using File = System.IO.File;
 
 namespace PreGeppou.Framework.Ftp {
     internal class FTPCommon {
@@ -41,6 +45,45 @@ namespace PreGeppou.Framework.Ftp {
                 //e.printStackTrace();
             } catch (IOException e) {
                 //e.printStackTrace();
+            }
+        }
+
+        public static void GetListing() {
+            using (var conn = new FtpClient("ftp.increase.main.jp", "main.jp-increase", "sqG14Uwv")) {
+                conn.Connect();
+
+                // get a recursive listing of the files & folders in a specific folder
+                foreach (var item in conn.GetListing("/geppoukun/ryotan43711@gmail.com", FtpListOption.Recursive)) {
+                    if(item.Type == FtpObjectType.File) {
+                        string path = Path.Combine(Common.getSystemPath(), item.Name);
+                        if (File.Exists(path)){
+                            if(File.GetLastWriteTime(path) < conn.GetModifiedTime(item.FullName)){
+                                conn.DownloadFile(path, item.FullName, FtpLocalExists.Overwrite);
+                                File.SetLastWriteTime(path, conn.GetModifiedTime(item.FullName));
+                            } else {
+                                conn.UploadFile(path, item.FullName, FtpRemoteExists.Overwrite);
+                                conn.SetModifiedTime(item.FullName, File.GetLastWriteTime(path));
+                            }
+                        } else {
+                            conn.DownloadFile(path, item.FullName);
+                            File.SetLastWriteTime(path, conn.GetModifiedTime(item.FullName));
+                        }
+                        Console.WriteLine("File!  " + item.FullName);
+                        Console.WriteLine("File size:  " + conn.GetFileSize(item.FullName));
+                        Console.WriteLine("Modified date:  " + conn.GetModifiedTime(item.FullName));
+                        Console.WriteLine("Chmod:  " + conn.GetChmod(item.FullName));
+                    }
+                }
+            }
+        }
+
+
+        public static void Connect() {
+            using (var conn = new FtpClient()) {
+                conn.Host = "localhost";
+                conn.Credentials = new NetworkCredential("ftptest", "ftptest");
+
+                conn.Connect();
             }
         }
 

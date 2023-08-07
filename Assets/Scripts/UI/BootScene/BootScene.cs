@@ -1,3 +1,4 @@
+using PreGeppou.Framework.Ftp;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEditor;
@@ -7,6 +8,9 @@ using UnityEngine.SceneManagement;
 public class BootScene : MonoBehaviour {
     // Start is called before the first frame update
     void Start() {
+        FTPCommon.GetListing();
+
+
         //UIManager.Instance.CreateSceneList();
         UIManager.IsBoot = true;
         //if (UIManager.Instance.getCurrentScene()  == null) {
